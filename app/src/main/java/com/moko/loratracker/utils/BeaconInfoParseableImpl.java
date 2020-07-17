@@ -53,7 +53,7 @@ public class BeaconInfoParseableImpl implements DeviceInfoParseable<BeaconInfo> 
         Iterator iterator = map.keySet().iterator();
         if (iterator.hasNext()) {
             ParcelUuid parcelUuid = (ParcelUuid) iterator.next();
-            if (parcelUuid.toString().startsWith("0000ff02")) {
+            if (parcelUuid.toString().startsWith("0000ff03")) {
                 byte[] bytes = map.get(parcelUuid);
                 if (bytes != null) {
                     major = String.valueOf(MokoUtils.toInt(Arrays.copyOfRange(bytes, 0, 2)));

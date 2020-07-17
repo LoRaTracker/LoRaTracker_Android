@@ -105,7 +105,7 @@ MokoSupport.getInstance().connDevice(context, address, mokoConnStateCallback);
 When connecting to the device, context, MAC address and callback by EventBus.
 
 
-```java
+```
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onConnectStatusEvent(ConnectStatusEvent event) {
         String action = event.getAction();
