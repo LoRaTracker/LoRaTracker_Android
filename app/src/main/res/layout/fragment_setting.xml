@@ -84,13 +84,13 @@
             app:layout_constraintTop_toBottomOf="@id/tv_update_firmware" />
 
         <TextView
-            android:id="@+id/tv_trigger_sensitivity"
+            android:id="@+id/tv_lora_setting"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_marginTop="20dp"
             android:drawableRight="@drawable/arrow_right"
             android:gravity="center_vertical"
-            android:text="@string/trigger_sensitivity"
+            android:text="@string/lora_setting"
             android:textColor="@color/black_333333"
             android:textSize="15sp"
             android:textStyle="bold"
@@ -105,7 +105,7 @@
             android:layout_marginTop="10dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_trigger_sensitivity" />
+            app:layout_constraintTop_toBottomOf="@id/tv_lora_setting" />
 
         <TextView
             android:id="@+id/tv_scan_window"
@@ -120,7 +120,7 @@
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_trigger_sensitivity" />
+            app:layout_constraintTop_toBottomOf="@id/tv_lora_setting" />
 
 
         <View
@@ -166,37 +166,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:text="Button Power"
-            android:textColor="@color/black_333333"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/iv_button_power"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="@id/iv_button_power" />
-
-        <ImageView
-            android:id="@+id/iv_button_power"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginTop="20dp"
-            android:gravity="center_vertical"
-            android:paddingLeft="20dp"
-            android:src="@drawable/ic_checked"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_connectable" />
-
-        <View
-            style="@style/divider_line"
-            android:layout_width="0dp"
-            android:layout_marginTop="10dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_button_power" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
             android:text="Power Off"
             android:textColor="@color/black_333333"
             android:textSize="15sp"
@@ -214,7 +183,7 @@
             android:paddingLeft="20dp"
             android:src="@drawable/ic_unchecked"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_button_power" />
+            app:layout_constraintTop_toBottomOf="@id/iv_connectable" />
 
         <View
             style="@style/divider_line"

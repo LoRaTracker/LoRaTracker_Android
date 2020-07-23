@@ -11,13 +11,13 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.constraint.ConstraintLayout;
-import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
-import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -29,6 +29,7 @@ import com.moko.loratracker.utils.ToastUtils;
 import com.moko.support.MokoConstants;
 import com.moko.support.MokoSupport;
 import com.moko.support.entity.ConfigKeyEnum;
+import com.moko.support.entity.DataTypeEnum;
 import com.moko.support.entity.OrderType;
 import com.moko.support.event.ConnectStatusEvent;
 import com.moko.support.task.OrderTask;
@@ -50,7 +51,6 @@ import butterknife.OnClick;
 
 public class FilterOptionsActivity extends BaseActivity implements SeekBar.OnSeekBarChangeListener {
 
-    public static final String UUID_PATTERN = "[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12}";
     private final String FILTER_ASCII = "\\A\\p{ASCII}*\\z";
     @Bind(R.id.sb_rssi_filter)
     SeekBar sbRssiFilter;
@@ -58,8 +58,6 @@ public class FilterOptionsActivity extends BaseActivity implements SeekBar.OnSee
     TextView tvRssiFilterValue;
     @Bind(R.id.tv_rssi_filter_tips)
     TextView tvRssiFilterTips;
-    @Bind(R.id.iv_adv_data_filter)
-    ImageView ivAdvDataFilter;
     @Bind(R.id.iv_mac_address)
     ImageView ivMacAddress;
     @Bind(R.id.et_mac_address)
@@ -68,30 +66,39 @@ public class FilterOptionsActivity extends BaseActivity implements SeekBar.OnSee
     ImageView ivAdvName;
     @Bind(R.id.et_adv_name)
     EditText etAdvName;
-    @Bind(R.id.iv_ibeacon_uuid)
-    ImageView ivIbeaconUuid;
-    @Bind(R.id.et_ibeacon_uuid)
-    EditText etIbeaconUuid;
     @Bind(R.id.iv_ibeacon_major)
     ImageView ivIbeaconMajor;
-    @Bind(R.id.et_ibeacon_major)
-    EditText etIbeaconMajor;
     @Bind(R.id.iv_ibeacon_minor)
     ImageView ivIbeaconMinor;
-    @Bind(R.id.et_ibeacon_minor)
-    EditText etIbeaconMinor;
     @Bind(R.id.iv_raw_adv_data)
     ImageView ivRawAdvData;
-    @Bind(R.id.et_raw_adv_data)
-    EditText etRawAdvData;
     @Bind(R.id.cl_adv_data_filter)
     ConstraintLayout clAdvDataFilter;
+    @Bind(R.id.et_ibeacon_major_min)
+    EditText etIbeaconMajorMin;
+    @Bind(R.id.et_ibeacon_major_max)
+    EditText etIbeaconMajorMax;
+    @Bind(R.id.ll_ibeacon_major)
+    LinearLayout llIbeaconMajor;
+    @Bind(R.id.et_ibeacon_minor_min)
+    EditText etIbeaconMinorMin;
+    @Bind(R.id.et_ibeacon_minor_max)
+    EditText etIbeaconMinorMax;
+    @Bind(R.id.ll_ibeacon_minor)
+    LinearLayout llIbeaconMinor;
+    @Bind(R.id.iv_raw_data_del)
+    ImageView ivRawDataDel;
+    @Bind(R.id.iv_raw_data_add)
+    ImageView ivRawDataAdd;
+    @Bind(R.id.ll_raw_data_filter)
+    LinearLayout llRawDataFilter;
     private boolean mReceiverTag = false;
     public MokoService mMokoService;
 
-    private Pattern pattern;
-
     private boolean savedParamsError;
+
+
+    private ArrayList<String> filterRawDatas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,54 +108,6 @@ public class FilterOptionsActivity extends BaseActivity implements SeekBar.OnSee
 
         sbRssiFilter.setOnSeekBarChangeListener(this);
 
-        pattern = Pattern.compile(UUID_PATTERN);
-        etIbeaconUuid.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String input = s.toString();
-                if (!pattern.matcher(input).matches()) {
-                    if (input.length() == 9 && !input.endsWith("-")) {
-                        String show = input.substring(0, 8) + "-" + input.substring(8, input.length());
-                        etIbeaconUuid.setText(show);
-                        etIbeaconUuid.setSelection(show.length());
-                    }
-                    if (input.length() == 14 && !input.endsWith("-")) {
-                        String show = input.substring(0, 13) + "-" + input.substring(13, input.length());
-                        etIbeaconUuid.setText(show);
-                        etIbeaconUuid.setSelection(show.length());
-                    }
-                    if (input.length() == 19 && !input.endsWith("-")) {
-                        String show = input.substring(0, 18) + "-" + input.substring(18, input.length());
-                        etIbeaconUuid.setText(show);
-                        etIbeaconUuid.setSelection(show.length());
-                    }
-                    if (input.length() == 24 && !input.endsWith("-")) {
-                        String show = input.substring(0, 23) + "-" + input.substring(23, input.length());
-                        etIbeaconUuid.setText(show);
-                        etIbeaconUuid.setSelection(show.length());
-                    }
-                    if (input.length() == 32 && input.indexOf("-") < 0) {
-                        StringBuilder stringBuilder = new StringBuilder(input);
-                        stringBuilder.insert(8, "-");
-                        stringBuilder.insert(13, "-");
-                        stringBuilder.insert(18, "-");
-                        stringBuilder.insert(23, "-");
-                        etIbeaconUuid.setText(stringBuilder.toString());
-                        etIbeaconUuid.setSelection(stringBuilder.toString().length());
-                    }
-                }
-            }
-        });
         InputFilter filter = (source, start, end, dest, dstart, dend) -> {
             if (!(source + "").matches(FILTER_ASCII)) {
                 return "";
@@ -186,13 +145,11 @@ public class FilterOptionsActivity extends BaseActivity implements SeekBar.OnSee
                 }
                 showSyncingProgressDialog();
                 List<OrderTask> orderTasks = new ArrayList<>();
-                orderTasks.add(mMokoService.getRssiFilter());
-                orderTasks.add(mMokoService.getFilterEnable());
+                orderTasks.add(mMokoService.getFilterRssi());
                 orderTasks.add(mMokoService.getFilterMac());
                 orderTasks.add(mMokoService.getFilterName());
-                orderTasks.add(mMokoService.getFilterUUID());
-                orderTasks.add(mMokoService.getFilterMajor());
-                orderTasks.add(mMokoService.getFilterMinor());
+                orderTasks.add(mMokoService.getFilterMajorRange());
+                orderTasks.add(mMokoService.getFilterMinorRange());
                 orderTasks.add(mMokoService.getFilterAdvRawData());
                 MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
             }
@@ -244,118 +201,107 @@ public class FilterOptionsActivity extends BaseActivity implements SeekBar.OnSee
                                 if (configKeyEnum == null) {
                                     return;
                                 }
-                                int length = value[3] & 0xFF;
+                                int length = value[2] & 0xFF;
                                 switch (configKeyEnum) {
-                                    case GET_STORE_RSSI_CONDITION:
-                                        if (length == 1) {
-                                            final int rssi = value[4];
+                                    case GET_FILTER_RSSI:
+                                        if (length > 0) {
+                                            final int rssi = value[3];
                                             int progress = rssi + 127;
                                             sbRssiFilter.setProgress(progress);
                                             tvRssiFilterValue.setText(String.format("%ddBm", rssi));
                                             tvRssiFilterTips.setText(getString(R.string.rssi_filter, rssi));
                                         }
                                         break;
-                                    case GET_FILTER_ENABLE:
-                                        if (length == 1) {
-                                            final int enable = value[4] & 0xFF;
-                                            advDataFilterEnable = enable == 0;
-                                            ivAdvDataFilter.setImageResource(advDataFilterEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-                                            clAdvDataFilter.setVisibility(advDataFilterEnable ? View.VISIBLE : View.GONE);
-                                        }
-                                        break;
                                     case GET_FILTER_MAC:
-                                        if (length > 0) {
-                                            final int enable = value[4] & 0xFF;
-                                            filterMacEnable = enable == 1;
-                                            ivMacAddress.setImageResource(filterMacEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-                                            etMacAddress.setVisibility(filterMacEnable ? View.VISIBLE : View.GONE);
-                                            if (length > 1) {
-                                                byte[] macBytes = Arrays.copyOfRange(value, 5, 4 + length);
-                                                String filterMac = MokoUtils.bytesToHexString(macBytes).toUpperCase();
-                                                etMacAddress.setText(filterMac);
-                                            }
+                                        filterMacEnable = length > 0;
+                                        ivMacAddress.setImageResource(filterMacEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
+                                        etMacAddress.setVisibility(filterMacEnable ? View.VISIBLE : View.GONE);
+                                        if (filterMacEnable) {
+                                            byte[] macBytes = Arrays.copyOfRange(value, 3, 3 + length);
+                                            String filterMac = MokoUtils.bytesToHexString(macBytes).toUpperCase();
+                                            etMacAddress.setText(filterMac);
                                         }
                                         break;
-                                    case GET_FILTER_NAME:
-                                        if (length > 0) {
-                                            final int enable = value[4] & 0xFF;
-                                            filterNameEnable = enable == 1;
-                                            ivAdvName.setImageResource(filterNameEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-                                            etAdvName.setVisibility(filterNameEnable ? View.VISIBLE : View.GONE);
-                                            if (length > 1) {
-                                                byte[] nameBytes = Arrays.copyOfRange(value, 5, 4 + length);
-                                                String filterName = new String(nameBytes);
-                                                etAdvName.setText(filterName);
-                                            }
+                                    case GET_FILTER_ADV_NAME:
+                                        filterMacEnable = length > 0;
+                                        ivAdvName.setImageResource(filterNameEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
+                                        etAdvName.setVisibility(filterNameEnable ? View.VISIBLE : View.GONE);
+                                        if (filterNameEnable) {
+                                            byte[] nameBytes = Arrays.copyOfRange(value, 3, 3 + length);
+                                            String filterName = new String(nameBytes);
+                                            etAdvName.setText(filterName);
                                         }
                                         break;
-                                    case GET_FILTER_UUID:
-                                        if (length > 0) {
-                                            filterUUIDEnable = length != 1;
-                                            ivIbeaconUuid.setImageResource(filterUUIDEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-                                            etIbeaconUuid.setVisibility(filterUUIDEnable ? View.VISIBLE : View.GONE);
-                                            if (length > 1) {
-                                                byte[] uuidBytes = Arrays.copyOfRange(value, 4, 4 + length);
-                                                String filterUUID = MokoUtils.bytesToHexString(uuidBytes).toUpperCase();
-                                                StringBuilder stringBuilder = new StringBuilder(filterUUID);
-                                                stringBuilder.insert(8, "-");
-                                                stringBuilder.insert(13, "-");
-                                                stringBuilder.insert(18, "-");
-                                                stringBuilder.insert(23, "-");
-                                                etIbeaconUuid.setText(stringBuilder.toString());
-                                            }
+                                    case GET_FILTER_MAJOR_RANGE:
+                                        filterMajorEnable = length > 0;
+                                        ivIbeaconMajor.setImageResource(filterMajorEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
+                                        llIbeaconMajor.setVisibility(filterMajorEnable ? View.VISIBLE : View.GONE);
+                                        if (filterMajorEnable) {
+                                            byte[] majorMinBytes = Arrays.copyOfRange(value, 3, 5);
+                                            int majorMin = MokoUtils.toInt(majorMinBytes);
+                                            etIbeaconMajorMin.setText(String.valueOf(majorMin));
+                                            byte[] majorMaxBytes = Arrays.copyOfRange(value, 5, 7);
+                                            int majorMax = MokoUtils.toInt(majorMaxBytes);
+                                            etIbeaconMajorMax.setText(String.valueOf(majorMax));
                                         }
                                         break;
-                                    case GET_FILTER_MAJOR:
-                                        if (length > 0) {
-                                            filterMajorEnable = length != 1;
-                                            ivIbeaconMajor.setImageResource(filterMajorEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-                                            etIbeaconMajor.setVisibility(filterMajorEnable ? View.VISIBLE : View.GONE);
-                                            if (length > 1) {
-                                                byte[] majorBytes = Arrays.copyOfRange(value, 4, 4 + length);
-                                                int major = MokoUtils.toInt(majorBytes);
-                                                etIbeaconMajor.setText(String.valueOf(major));
-                                            }
-                                        }
-                                        break;
-                                    case GET_FILTER_MINOR:
-                                        if (length > 0) {
-                                            filterMinorEnable = length != 1;
-                                            ivIbeaconMinor.setImageResource(filterMinorEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-                                            etIbeaconMinor.setVisibility(filterMinorEnable ? View.VISIBLE : View.GONE);
-                                            if (length > 1) {
-                                                byte[] minorBytes = Arrays.copyOfRange(value, 4, 4 + length);
-                                                int minor = MokoUtils.toInt(minorBytes);
-                                                etIbeaconMinor.setText(String.valueOf(minor));
-                                            }
+                                    case GET_FILTER_MINOR_RANGE:
+                                        filterMinorEnable = length > 0;
+                                        ivIbeaconMinor.setImageResource(filterMinorEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
+                                        llIbeaconMinor.setVisibility(filterMinorEnable ? View.VISIBLE : View.GONE);
+                                        if (length > 1) {
+                                            byte[] minorMinBytes = Arrays.copyOfRange(value, 3, 5);
+                                            int minorMin = MokoUtils.toInt(minorMinBytes);
+                                            etIbeaconMinorMin.setText(String.valueOf(minorMin));
+                                            byte[] minorMaxBytes = Arrays.copyOfRange(value, 5, 7);
+                                            int minorMax = MokoUtils.toInt(minorMaxBytes);
+                                            etIbeaconMinorMax.setText(String.valueOf(minorMax));
                                         }
                                         break;
                                     case GET_FILTER_ADV_RAW_DATA:
-                                        if (length > 0) {
-                                            final int enable = value[4] & 0xFF;
-                                            filterRawAdvDataEnable = enable == 1;
-                                            ivRawAdvData.setImageResource(filterRawAdvDataEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-                                            etRawAdvData.setVisibility(filterRawAdvDataEnable ? View.VISIBLE : View.GONE);
-                                            if (length > 1) {
-                                                byte[] rawDataBytes = Arrays.copyOfRange(value, 5, 4 + length);
-                                                String filterRawData = MokoUtils.bytesToHexString(rawDataBytes).toUpperCase();
-                                                etRawAdvData.setText(filterRawData);
+                                        final String filterRawData = MokoSupport.getInstance().filterRawData;
+                                        filterRawAdvDataEnable = !TextUtils.isEmpty(filterRawData);
+                                        ivRawAdvData.setImageResource(filterRawAdvDataEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
+                                        llRawDataFilter.setVisibility(filterRawAdvDataEnable ? View.VISIBLE : View.GONE);
+                                        ivRawDataAdd.setVisibility(filterRawAdvDataEnable ? View.VISIBLE : View.GONE);
+                                        ivRawDataDel.setVisibility(filterRawAdvDataEnable ? View.VISIBLE : View.GONE);
+                                        if (filterRawData.length() > 0) {
+                                            byte[] dataBytes = MokoUtils.hex2bytes(filterRawData);
+                                            for (int i = 0, l = dataBytes.length; i < l; ) {
+                                                View v = LayoutInflater.from(FilterOptionsActivity.this).inflate(R.layout.item_raw_data_filter, llRawDataFilter, false);
+                                                EditText etDataType = ButterKnife.findById(v, R.id.et_data_type);
+                                                EditText etMin = ButterKnife.findById(v, R.id.et_min);
+                                                EditText etMax = ButterKnife.findById(v, R.id.et_max);
+                                                EditText etRawData = ButterKnife.findById(v, R.id.et_raw_data);
+                                                int filterLength = dataBytes[i] & 0xFF;
+                                                i++;
+                                                String type = MokoUtils.byte2HexString(dataBytes[i]);
+                                                i++;
+                                                String min = String.valueOf((dataBytes[i] & 0xFF));
+                                                i++;
+                                                String max = String.valueOf((dataBytes[i] & 0xFF));
+                                                i++;
+                                                String data = MokoUtils.bytesToHexString(Arrays.copyOfRange(dataBytes, i, i + filterLength - 3));
+                                                i += filterLength - 3;
+                                                etDataType.setText(type);
+                                                etMin.setText(min);
+                                                etMax.setText(max);
+                                                etRawData.setText(data);
+                                                llRawDataFilter.addView(v);
                                             }
                                         }
                                         break;
-                                    case SET_STORE_RSSI_CONDITION:
+                                    case SET_FILTER_RSSI:
                                     case SET_FILTER_MAC:
-                                    case SET_FILTER_NAME:
-                                    case SET_FILTER_UUID:
-                                    case SET_FILTER_MAJOR:
-                                    case SET_FILTER_MINOR:
-                                    case SET_FILTER_ADV_RAW_DATA:
-                                        if (length != 0) {
+                                    case SET_FILTER_ADV_NAME:
+                                    case SET_FILTER_MAJOR_RANGE:
+                                    case SET_FILTER_MINOR_RANGE:
+                                        if ((value[3] & 0xFF) != 1) {
                                             savedParamsError = true;
                                         }
                                         break;
-                                    case SET_FILTER_ENABLE:
-                                        if (length != 0) {
+                                    case SET_FILTER_ADV_RAW_DATA:
+                                        if ((value[3] & 0xFF) != 1) {
                                             savedParamsError = true;
                                         }
                                         if (savedParamsError) {
@@ -378,18 +324,8 @@ public class FilterOptionsActivity extends BaseActivity implements SeekBar.OnSee
                     switch (blueState) {
                         case BluetoothAdapter.STATE_TURNING_OFF:
                             dismissSyncProgressDialog();
-//                            AlertDialog.Builder builder = new AlertDialog.Builder(FilterOptionsActivity.this);
-//                            builder.setTitle("Dismiss");
-//                            builder.setCancelable(false);
-//                            builder.setMessage("The current system of bluetooth is not available!");
-//                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
                             FilterOptionsActivity.this.setResult(RESULT_OK);
                             finish();
-//                                }
-//                            });
-//                            builder.show();
                             break;
                     }
                 }
@@ -423,17 +359,15 @@ public class FilterOptionsActivity extends BaseActivity implements SeekBar.OnSee
             mLoadingMessageDialog.dismissAllowingStateLoss();
     }
 
-    private boolean advDataFilterEnable;
     private boolean filterMacEnable;
     private boolean filterNameEnable;
-    private boolean filterUUIDEnable;
     private boolean filterMajorEnable;
     private boolean filterMinorEnable;
     private boolean filterRawAdvDataEnable;
 
-    @OnClick({R.id.tv_back, R.id.iv_save, R.id.iv_adv_data_filter, R.id.iv_mac_address,
-            R.id.iv_adv_name, R.id.iv_ibeacon_uuid, R.id.iv_ibeacon_major,
-            R.id.iv_ibeacon_minor, R.id.iv_raw_adv_data})
+    @OnClick({R.id.tv_back, R.id.iv_save, R.id.iv_mac_address, R.id.iv_adv_name,
+            R.id.iv_ibeacon_major, R.id.iv_ibeacon_minor, R.id.iv_raw_adv_data,
+            R.id.iv_raw_data_add, R.id.iv_raw_data_del})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_back:
@@ -447,11 +381,6 @@ public class FilterOptionsActivity extends BaseActivity implements SeekBar.OnSee
                     ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
                 }
                 break;
-            case R.id.iv_adv_data_filter:
-                advDataFilterEnable = !advDataFilterEnable;
-                ivAdvDataFilter.setImageResource(advDataFilterEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-                clAdvDataFilter.setVisibility(advDataFilterEnable ? View.VISIBLE : View.GONE);
-                break;
             case R.id.iv_mac_address:
                 filterMacEnable = !filterMacEnable;
                 ivMacAddress.setImageResource(filterMacEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
@@ -462,25 +391,45 @@ public class FilterOptionsActivity extends BaseActivity implements SeekBar.OnSee
                 ivAdvName.setImageResource(filterNameEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
                 etAdvName.setVisibility(filterNameEnable ? View.VISIBLE : View.GONE);
                 break;
-            case R.id.iv_ibeacon_uuid:
-                filterUUIDEnable = !filterUUIDEnable;
-                ivIbeaconUuid.setImageResource(filterUUIDEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-                etIbeaconUuid.setVisibility(filterUUIDEnable ? View.VISIBLE : View.GONE);
-                break;
             case R.id.iv_ibeacon_major:
                 filterMajorEnable = !filterMajorEnable;
                 ivIbeaconMajor.setImageResource(filterMajorEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-                etIbeaconMajor.setVisibility(filterMajorEnable ? View.VISIBLE : View.GONE);
+                llIbeaconMajor.setVisibility(filterMajorEnable ? View.VISIBLE : View.GONE);
                 break;
             case R.id.iv_ibeacon_minor:
                 filterMinorEnable = !filterMinorEnable;
                 ivIbeaconMinor.setImageResource(filterMinorEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-                etIbeaconMinor.setVisibility(filterMinorEnable ? View.VISIBLE : View.GONE);
+                llIbeaconMinor.setVisibility(filterMinorEnable ? View.VISIBLE : View.GONE);
                 break;
             case R.id.iv_raw_adv_data:
                 filterRawAdvDataEnable = !filterRawAdvDataEnable;
                 ivRawAdvData.setImageResource(filterRawAdvDataEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-                etRawAdvData.setVisibility(filterRawAdvDataEnable ? View.VISIBLE : View.GONE);
+                llRawDataFilter.setVisibility(filterRawAdvDataEnable ? View.VISIBLE : View.GONE);
+                ivRawDataAdd.setVisibility(filterRawAdvDataEnable ? View.VISIBLE : View.GONE);
+                ivRawDataDel.setVisibility(filterRawAdvDataEnable ? View.VISIBLE : View.GONE);
+                break;
+            case R.id.iv_raw_data_add:
+                int count = llRawDataFilter.getChildCount();
+                if (count > 4) {
+                    ToastUtils.showToast(this, "You can set up to 5 filters!");
+                    return;
+                }
+                View v = LayoutInflater.from(this).inflate(R.layout.item_raw_data_filter, llRawDataFilter, false);
+                llRawDataFilter.addView(v);
+                break;
+            case R.id.iv_raw_data_del:
+                final int c = llRawDataFilter.getChildCount();
+                if (c == 0) {
+                    ToastUtils.showToast(this, "There are currently no filters to delete");
+                    return;
+                }
+                AlertMessageDialog dialog = new AlertMessageDialog();
+                dialog.setOnAlertConfirmListener(() -> {
+                    if (c > 0) {
+                        llRawDataFilter.removeViewAt(c - 1);
+                    }
+                });
+                dialog.show(getSupportFragmentManager());
                 break;
         }
     }
@@ -491,32 +440,23 @@ public class FilterOptionsActivity extends BaseActivity implements SeekBar.OnSee
         List<OrderTask> orderTasks = new ArrayList<>();
         final String mac = etMacAddress.getText().toString();
         final String name = etAdvName.getText().toString();
-        final String uuid = etIbeaconUuid.getText().toString();
-        String uuidStr = uuid.replaceAll("-", "");
-        final String major = etIbeaconMajor.getText().toString();
-        final String minor = etIbeaconMinor.getText().toString();
-        final String rawData = etRawAdvData.getText().toString();
-        String majorStr = "";
-        if (!TextUtils.isEmpty(major)) {
-            majorStr = String.format("%04x", Integer.parseInt(major));
-        }
-        String minorStr = "";
-        if (!TextUtils.isEmpty(minor)) {
-            minorStr = String.format("%04x", Integer.parseInt(minor));
-        }
+        final String majorMin = etIbeaconMajorMin.getText().toString();
+        final String majorMax = etIbeaconMajorMax.getText().toString();
+        final String minorMin = etIbeaconMinorMin.getText().toString();
+        final String minorMax = etIbeaconMinorMax.getText().toString();
 
         orderTasks.add(mMokoService.setFilterRssi(filterRssi));
-        if (advDataFilterEnable) {
-            orderTasks.add(mMokoService.setFilterMac(filterMacEnable ? mac : ""));
-            orderTasks.add(mMokoService.setFilterName(filterNameEnable ? name : ""));
-            orderTasks.add(mMokoService.setFilterUUID(filterUUIDEnable ? uuidStr : ""));
-            orderTasks.add(mMokoService.setFilterMajor(filterMajorEnable ? majorStr : ""));
-            orderTasks.add(mMokoService.setFilterMinor(filterMinorEnable ? minorStr : ""));
-            orderTasks.add(mMokoService.setFilterAdvRawData(filterRawAdvDataEnable ? rawData : ""));
-            orderTasks.add(mMokoService.setFilterEnable(0));
-        } else {
-            orderTasks.add(mMokoService.setFilterEnable(1));
-        }
+        orderTasks.add(mMokoService.setFilterMac(filterMacEnable ? mac : ""));
+        orderTasks.add(mMokoService.setFilterName(filterNameEnable ? name : ""));
+        orderTasks.add(mMokoService.setFilterMajorRange(
+                filterMajorEnable ? 1 : 0,
+                filterMajorEnable ? Integer.parseInt(majorMin) : 0,
+                filterMajorEnable ? Integer.parseInt(majorMax) : 0));
+        orderTasks.add(mMokoService.setFilterMinorRange(
+                filterMinorEnable ? 1 : 0,
+                filterMinorEnable ? Integer.parseInt(minorMin) : 0,
+                filterMinorEnable ? Integer.parseInt(minorMax) : 0));
+        orderTasks.add(mMokoService.setFilterAdvRawData(filterRawAdvDataEnable ? filterRawDatas : null));
 
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
@@ -524,13 +464,10 @@ public class FilterOptionsActivity extends BaseActivity implements SeekBar.OnSee
     private boolean isValid() {
         final String mac = etMacAddress.getText().toString();
         final String name = etAdvName.getText().toString();
-        final String uuid = etIbeaconUuid.getText().toString();
-        final String major = etIbeaconMajor.getText().toString();
-        final String minor = etIbeaconMinor.getText().toString();
-        final String rawData = etRawAdvData.getText().toString();
-        if (!advDataFilterEnable) {
-            return true;
-        }
+        final String majorMin = etIbeaconMajorMin.getText().toString();
+        final String majorMax = etIbeaconMajorMax.getText().toString();
+        final String minorMin = etIbeaconMinorMin.getText().toString();
+        final String minorMax = etIbeaconMinorMax.getText().toString();
         if (filterMacEnable) {
             if (TextUtils.isEmpty(mac))
                 return false;
@@ -542,32 +479,89 @@ public class FilterOptionsActivity extends BaseActivity implements SeekBar.OnSee
             if (TextUtils.isEmpty(name))
                 return false;
         }
-        if (filterUUIDEnable) {
-            if (TextUtils.isEmpty(uuid))
-                return false;
-            int length = uuid.length();
-            if (length != 36)
-                return false;
-        }
         if (filterMajorEnable) {
-            if (TextUtils.isEmpty(major))
+            if (TextUtils.isEmpty(majorMin))
                 return false;
-            if (Integer.parseInt(major) > 65535)
+            if (Integer.parseInt(majorMin) > 65535)
                 return false;
-        }
-        if (filterMinorEnable) {
-            if (TextUtils.isEmpty(minor))
+            if (TextUtils.isEmpty(majorMax))
                 return false;
-            if (Integer.parseInt(minor) > 65535)
+            if (Integer.parseInt(majorMax) > 65535)
                 return false;
-        }
-        if (filterRawAdvDataEnable) {
-            if (TextUtils.isEmpty(rawData))
-                return false;
-            int length = rawData.length();
-            if (length % 2 != 0)
+            if (Integer.parseInt(majorMin) > Integer.parseInt(majorMax))
                 return false;
 
+        }
+        if (filterMinorEnable) {
+            if (TextUtils.isEmpty(minorMin))
+                return false;
+            if (Integer.parseInt(minorMin) > 65535)
+                return false;
+            if (TextUtils.isEmpty(minorMax))
+                return false;
+            if (Integer.parseInt(minorMax) > 65535)
+                return false;
+            if (Integer.parseInt(minorMin) > Integer.parseInt(minorMax))
+                return false;
+        }
+        filterRawDatas = new ArrayList<>();
+        if (filterRawAdvDataEnable) {
+            // 发送设置的过滤RawData
+            int count = llRawDataFilter.getChildCount();
+            if (count == 0)
+                return false;
+
+            for (int i = 0; i < count; i++) {
+                View v = llRawDataFilter.getChildAt(i);
+                EditText etDataType = ButterKnife.findById(v, R.id.et_data_type);
+                EditText etMin = ButterKnife.findById(v, R.id.et_min);
+                EditText etMax = ButterKnife.findById(v, R.id.et_max);
+                EditText etRawData = ButterKnife.findById(v, R.id.et_raw_data);
+                final String dataTypeStr = etDataType.getText().toString();
+                final String minStr = etMin.getText().toString();
+                final String maxStr = etMax.getText().toString();
+                final String rawDataStr = etRawData.getText().toString();
+
+                if (TextUtils.isEmpty(dataTypeStr))
+                    return false;
+
+                final int dataType = Integer.parseInt(dataTypeStr, 16);
+                final DataTypeEnum dataTypeEnum = DataTypeEnum.fromDataType(dataType);
+                if (dataTypeEnum == null)
+                    return false;
+                if (TextUtils.isEmpty(rawDataStr))
+                    return false;
+                int length = rawDataStr.length();
+                if (length % 2 != 0)
+                    return false;
+                int min = 0;
+                if (!TextUtils.isEmpty(minStr))
+                    min = Integer.parseInt(minStr);
+                int max = 0;
+                if (!TextUtils.isEmpty(maxStr))
+                    max = Integer.parseInt(maxStr);
+                if (min == 0 && max != 0)
+                    return false;
+                if (min > 29)
+                    return false;
+                if (max > 29)
+                    return false;
+                if (max < min)
+                    return false;
+                if (min > 0) {
+                    int interval = max - min;
+                    if (length != ((interval + 1) * 2))
+                        return false;
+                }
+                int rawDataLength = 3 + length / 2;
+                StringBuffer rawData = new StringBuffer();
+                rawData.append(MokoUtils.int2HexString(rawDataLength));
+                rawData.append(MokoUtils.int2HexString(dataType));
+                rawData.append(MokoUtils.int2HexString(min));
+                rawData.append(MokoUtils.int2HexString(max));
+                rawData.append(rawDataStr);
+                filterRawDatas.add(rawData.toString());
+            }
         }
         return true;
     }

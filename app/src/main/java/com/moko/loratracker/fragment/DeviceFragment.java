@@ -82,7 +82,7 @@ public class DeviceFragment extends Fragment {
     }
 
     public void setBatteryValtage(int battery) {
-        tvBatteryVoltage.setText(String.format("%dmV", battery));
+        tvBatteryVoltage.setText(String.format("%d%%", battery));
     }
 
     public void setMacAddress(String macAddress) {

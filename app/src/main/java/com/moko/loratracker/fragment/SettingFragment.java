@@ -15,7 +15,6 @@ import com.moko.loratracker.dialog.AlertMessageDialog;
 import com.moko.loratracker.dialog.ChangePasswordDialog;
 import com.moko.loratracker.dialog.ResetDialog;
 import com.moko.loratracker.dialog.ScanWindowDialog;
-import com.moko.loratracker.dialog.TriggerSensitivityDialog;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -32,14 +31,12 @@ public class SettingFragment extends Fragment {
     TextView tvFactoryReset;
     @Bind(R.id.tv_update_firmware)
     TextView tvUpdateFirmware;
-    @Bind(R.id.tv_trigger_sensitivity)
-    TextView tvTriggerSensitivity;
+    @Bind(R.id.tv_lora_setting)
+    TextView tvLoraSetting;
     @Bind(R.id.tv_scan_window)
     TextView tvScanWindow;
     @Bind(R.id.iv_connectable)
     ImageView ivConnectable;
-    @Bind(R.id.iv_button_power)
-    ImageView ivButtonPower;
     @Bind(R.id.iv_power_off)
     ImageView ivPowerOff;
 
@@ -92,8 +89,8 @@ public class SettingFragment extends Fragment {
     }
 
     @OnClick({R.id.tv_change_password, R.id.tv_factory_reset, R.id.tv_update_firmware,
-            R.id.tv_trigger_sensitivity, R.id.tv_scan_window, R.id.iv_connectable,
-            R.id.iv_button_power, R.id.iv_power_off})
+            R.id.tv_lora_setting, R.id.tv_scan_window, R.id.iv_connectable,
+            R.id.iv_power_off})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_change_password:
@@ -105,8 +102,8 @@ public class SettingFragment extends Fragment {
             case R.id.tv_update_firmware:
                 activity.chooseFirmwareFile();
                 break;
-            case R.id.tv_trigger_sensitivity:
-                showTriggerSensitivityDialog();
+            case R.id.tv_lora_setting:
+                // TODO: 2020/7/21 LORA
                 break;
             case R.id.tv_scan_window:
                 showBeaconScannerDialog();
@@ -114,25 +111,16 @@ public class SettingFragment extends Fragment {
             case R.id.iv_connectable:
                 showConnectableDialog();
                 break;
-            case R.id.iv_button_power:
-                showButtonPowerDialog();
-                break;
             case R.id.iv_power_off:
                 showPowerOffDialog();
                 break;
         }
     }
 
-    private void showTriggerSensitivityDialog() {
-        final TriggerSensitivityDialog dialog = new TriggerSensitivityDialog(getActivity());
-        dialog.setData(sensitivityStr);
-        dialog.setOnSensitivityClicked(sensitivity -> activity.setSensitivity(sensitivity));
-        dialog.show();
-    }
 
     private void showResetDialog() {
         final ResetDialog dialog = new ResetDialog(getActivity());
-        dialog.setOnPasswordClicked(password -> activity.reset(password));
+        dialog.setOnPasswordClicked(password -> activity.reset());
         dialog.show();
         Timer resetTimer = new Timer();
         resetTimer.schedule(new TimerTask() {
@@ -183,9 +171,9 @@ public class SettingFragment extends Fragment {
             tvScanWindow.setText(String.format("Scan Window(%s)", scanModeStr));
             if (scanMode < 4) {
                 scanMode += 1;
-                activity.changeScannerState(1, scanMode);
+                activity.setScanWindow(1, scanMode);
             } else {
-                activity.changeScannerState(0);
+                activity.setScanWindow(0, 1);
             }
         });
         dialog.show();
@@ -208,23 +196,6 @@ public class SettingFragment extends Fragment {
         dialog.show(activity.getSupportFragmentManager());
     }
 
-    private void showButtonPowerDialog() {
-        AlertMessageDialog dialog = new AlertMessageDialog();
-        dialog.setTitle("Warning!");
-        if (buttonPowerState) {
-            dialog.setMessage("If you turn off the Button Power function, you cannot turn off the beacon power with the button.");
-        } else {
-            dialog.setMessage("If you turn on the Button Power function, you can turn off the beacon power with the button.");
-        }
-        dialog.setConfirm("OK");
-        dialog.setCancelGone();
-        dialog.setOnAlertConfirmListener(() -> {
-            int value = !buttonPowerState ? 1 : 0;
-            activity.changeButtonPowerState(value);
-        });
-        dialog.show(activity.getSupportFragmentManager());
-    }
-
     private void showPowerOffDialog() {
         AlertMessageDialog dialog = new AlertMessageDialog();
         dialog.setTitle("Warning!");
@@ -237,25 +208,11 @@ public class SettingFragment extends Fragment {
         dialog.show(activity.getSupportFragmentManager());
     }
 
-    private String sensitivityStr;
-
-    public void setSensitivity(int sensitivity) {
-        sensitivityStr = String.valueOf(sensitivity);
-        int value = 248 - (sensitivity - 7);
-        tvTriggerSensitivity.setText(getString(R.string.trigger_sensitivity, value));
-    }
-
     private boolean scannerState;
     private int startTime;
 
-    public void setBeaconScanner(int scanner) {
+    public void setScanWindow(int scanner, int startTime) {
         scannerState = scanner == 1;
-        if (!scannerState) {
-            tvScanWindow.setText("Scan Window(0ms/1000ms)");
-        }
-    }
-
-    public void setScanStartTime(int startTime) {
         this.startTime = startTime;
         String scanModeStr = "";
         switch (startTime) {
@@ -281,16 +238,5 @@ public class SettingFragment extends Fragment {
     public void setConnectable(int connectable) {
         connectState = connectable == 1;
         ivConnectable.setImageResource(connectable == 1 ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-    }
-
-    private boolean buttonPowerState;
-
-    public void setButtonPower(int enable) {
-        buttonPowerState = enable == 1;
-        ivButtonPower.setImageResource(enable == 1 ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-    }
-
-    public void disableTrigger() {
-        tvTriggerSensitivity.setVisibility(View.GONE);
     }
 }

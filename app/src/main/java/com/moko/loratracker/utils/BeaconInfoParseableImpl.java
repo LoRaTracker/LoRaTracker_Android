@@ -50,20 +50,22 @@ public class BeaconInfoParseableImpl implements DeviceInfoParseable<BeaconInfo> 
         int connectable = 0;
         int track = 0;
         int battery = 0;
+        int deviceType = 0;
         Iterator iterator = map.keySet().iterator();
         if (iterator.hasNext()) {
             ParcelUuid parcelUuid = (ParcelUuid) iterator.next();
             if (parcelUuid.toString().startsWith("0000ff03")) {
                 byte[] bytes = map.get(parcelUuid);
                 if (bytes != null) {
-                    major = String.valueOf(MokoUtils.toInt(Arrays.copyOfRange(bytes, 0, 2)));
-                    minor = String.valueOf(MokoUtils.toInt(Arrays.copyOfRange(bytes, 2, 4)));
-                    rssi_1m = bytes[4];
-                    txPower = bytes[5];
-                    String binary = MokoUtils.hexString2binaryString(MokoUtils.byte2HexString(bytes[6]));
+                    deviceType = bytes[0] & 0xFF;
+                    major = String.valueOf(MokoUtils.toInt(Arrays.copyOfRange(bytes, 1, 3)));
+                    minor = String.valueOf(MokoUtils.toInt(Arrays.copyOfRange(bytes, 3, 5)));
+                    rssi_1m = bytes[5];
+                    txPower = bytes[6];
+                    String binary = MokoUtils.hexString2binaryString(MokoUtils.byte2HexString(bytes[7]));
                     connectable = Integer.parseInt(binary.substring(7));
                     track = Integer.parseInt(binary.substring(6, 7));
-                    battery = MokoUtils.toInt(Arrays.copyOfRange(bytes, 7, 9));
+                    battery = bytes[8] & 0xFF;
                 }
             } else {
                 return null;
@@ -83,6 +85,7 @@ public class BeaconInfoParseableImpl implements DeviceInfoParseable<BeaconInfo> 
             beaconInfo.name = deviceInfo.name;
             beaconInfo.rssi = deviceInfo.rssi;
             beaconInfo.battery = battery;
+            beaconInfo.deviceType = deviceType;
             long currentTime = SystemClock.elapsedRealtime();
             long intervalTime = currentTime - beaconInfo.scanTime;
             beaconInfo.intervalTime = intervalTime;
@@ -93,6 +96,7 @@ public class BeaconInfoParseableImpl implements DeviceInfoParseable<BeaconInfo> 
             beaconInfo.mac = deviceInfo.mac;
             beaconInfo.rssi = deviceInfo.rssi;
             beaconInfo.battery = battery;
+            beaconInfo.deviceType = deviceType;
             beaconInfo.connectable = connectable;
             beaconInfo.track = track;
             beaconInfo.major = major;

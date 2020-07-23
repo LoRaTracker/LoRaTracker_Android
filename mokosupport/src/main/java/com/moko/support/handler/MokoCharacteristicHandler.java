@@ -109,63 +109,59 @@ public class MokoCharacteristicHandler {
                         mokoCharacteristicMap.put(OrderType.DISCONNECTED_NOTIFY, new MokoCharacteristic(characteristic, OrderType.DISCONNECTED_NOTIFY));
                         continue;
                     }
-                    if (characteristicUuid.equals(OrderType.STORE_DATA_NOTIFY.getUuid())) {
-                        gatt.setCharacteristicNotification(characteristic, true);
-                        mokoCharacteristicMap.put(OrderType.STORE_DATA_NOTIFY, new MokoCharacteristic(characteristic, OrderType.STORE_DATA_NOTIFY));
-                        continue;
-                    }
-                    if (characteristicUuid.equals(OrderType.DEVICE_TYPE.getUuid())) {
-                        mokoCharacteristicMap.put(OrderType.DEVICE_TYPE, new MokoCharacteristic(characteristic, OrderType.DEVICE_TYPE));
-                        continue;
-                    }
-                    if (characteristicUuid.equals(OrderType.UUID.getUuid())) {
-                        mokoCharacteristicMap.put(OrderType.UUID, new MokoCharacteristic(characteristic, OrderType.UUID));
-                        continue;
-                    }
-                    if (characteristicUuid.equals(OrderType.MAJOR.getUuid())) {
-                        mokoCharacteristicMap.put(OrderType.MAJOR, new MokoCharacteristic(characteristic, OrderType.MAJOR));
-                        continue;
-                    }
-                    if (characteristicUuid.equals(OrderType.MINOR.getUuid())) {
-                        mokoCharacteristicMap.put(OrderType.MINOR, new MokoCharacteristic(characteristic, OrderType.MINOR));
-                        continue;
-                    }
-                    if (characteristicUuid.equals(OrderType.MEASURE_POWER.getUuid())) {
-                        mokoCharacteristicMap.put(OrderType.MEASURE_POWER, new MokoCharacteristic(characteristic, OrderType.MEASURE_POWER));
-                        continue;
-                    }
-                    if (characteristicUuid.equals(OrderType.TRANSMISSION.getUuid())) {
-                        mokoCharacteristicMap.put(OrderType.TRANSMISSION, new MokoCharacteristic(characteristic, OrderType.TRANSMISSION));
-                        continue;
-                    }
-                    if (characteristicUuid.equals(OrderType.ADV_INTERVAL.getUuid())) {
-                        mokoCharacteristicMap.put(OrderType.ADV_INTERVAL, new MokoCharacteristic(characteristic, OrderType.ADV_INTERVAL));
-                        continue;
-                    }
-                    if (characteristicUuid.equals(OrderType.DEVICE_NAME.getUuid())) {
-                        mokoCharacteristicMap.put(OrderType.DEVICE_NAME, new MokoCharacteristic(characteristic, OrderType.DEVICE_NAME));
-                        continue;
-                    }
-                    if (characteristicUuid.equals(OrderType.BATTERY.getUuid())) {
-                        mokoCharacteristicMap.put(OrderType.BATTERY, new MokoCharacteristic(characteristic, OrderType.BATTERY));
-                        continue;
-                    }
-                    if (characteristicUuid.equals(OrderType.SCAN_MODE.getUuid())) {
-                        mokoCharacteristicMap.put(OrderType.SCAN_MODE, new MokoCharacteristic(characteristic, OrderType.SCAN_MODE));
-                        continue;
-                    }
-                    if (characteristicUuid.equals(OrderType.CONNECTION_MODE.getUuid())) {
-                        mokoCharacteristicMap.put(OrderType.CONNECTION_MODE, new MokoCharacteristic(characteristic, OrderType.CONNECTION_MODE));
-                        continue;
-                    }
-                    if (characteristicUuid.equals(OrderType.STORE_ALERT.getUuid())) {
-                        mokoCharacteristicMap.put(OrderType.STORE_ALERT, new MokoCharacteristic(characteristic, OrderType.STORE_ALERT));
-                        continue;
-                    }
-                    if (characteristicUuid.equals(OrderType.RESET.getUuid())) {
-                        mokoCharacteristicMap.put(OrderType.RESET, new MokoCharacteristic(characteristic, OrderType.RESET));
-                        continue;
-                    }
+//                    if (characteristicUuid.equals(OrderType.STORE_DATA_NOTIFY.getUuid())) {
+//                        gatt.setCharacteristicNotification(characteristic, true);
+//                        mokoCharacteristicMap.put(OrderType.STORE_DATA_NOTIFY, new MokoCharacteristic(characteristic, OrderType.STORE_DATA_NOTIFY));
+//                        continue;
+//                    }
+//                    if (characteristicUuid.equals(OrderType.UUID.getUuid())) {
+//                        mokoCharacteristicMap.put(OrderType.UUID, new MokoCharacteristic(characteristic, OrderType.UUID));
+//                        continue;
+//                    }
+//                    if (characteristicUuid.equals(OrderType.MAJOR.getUuid())) {
+//                        mokoCharacteristicMap.put(OrderType.MAJOR, new MokoCharacteristic(characteristic, OrderType.MAJOR));
+//                        continue;
+//                    }
+//                    if (characteristicUuid.equals(OrderType.MINOR.getUuid())) {
+//                        mokoCharacteristicMap.put(OrderType.MINOR, new MokoCharacteristic(characteristic, OrderType.MINOR));
+//                        continue;
+//                    }
+//                    if (characteristicUuid.equals(OrderType.MEASURE_POWER.getUuid())) {
+//                        mokoCharacteristicMap.put(OrderType.MEASURE_POWER, new MokoCharacteristic(characteristic, OrderType.MEASURE_POWER));
+//                        continue;
+//                    }
+//                    if (characteristicUuid.equals(OrderType.TRANSMISSION.getUuid())) {
+//                        mokoCharacteristicMap.put(OrderType.TRANSMISSION, new MokoCharacteristic(characteristic, OrderType.TRANSMISSION));
+//                        continue;
+//                    }
+//                    if (characteristicUuid.equals(OrderType.ADV_INTERVAL.getUuid())) {
+//                        mokoCharacteristicMap.put(OrderType.ADV_INTERVAL, new MokoCharacteristic(characteristic, OrderType.ADV_INTERVAL));
+//                        continue;
+//                    }
+//                    if (characteristicUuid.equals(OrderType.DEVICE_NAME.getUuid())) {
+//                        mokoCharacteristicMap.put(OrderType.DEVICE_NAME, new MokoCharacteristic(characteristic, OrderType.DEVICE_NAME));
+//                        continue;
+//                    }
+//                    if (characteristicUuid.equals(OrderType.BATTERY.getUuid())) {
+//                        mokoCharacteristicMap.put(OrderType.BATTERY, new MokoCharacteristic(characteristic, OrderType.BATTERY));
+//                        continue;
+//                    }
+//                    if (characteristicUuid.equals(OrderType.SCAN_MODE.getUuid())) {
+//                        mokoCharacteristicMap.put(OrderType.SCAN_MODE, new MokoCharacteristic(characteristic, OrderType.SCAN_MODE));
+//                        continue;
+//                    }
+//                    if (characteristicUuid.equals(OrderType.CONNECTION_MODE.getUuid())) {
+//                        mokoCharacteristicMap.put(OrderType.CONNECTION_MODE, new MokoCharacteristic(characteristic, OrderType.CONNECTION_MODE));
+//                        continue;
+//                    }
+//                    if (characteristicUuid.equals(OrderType.STORE_ALERT.getUuid())) {
+//                        mokoCharacteristicMap.put(OrderType.STORE_ALERT, new MokoCharacteristic(characteristic, OrderType.STORE_ALERT));
+//                        continue;
+//                    }
+//                    if (characteristicUuid.equals(OrderType.RESET.getUuid())) {
+//                        mokoCharacteristicMap.put(OrderType.RESET, new MokoCharacteristic(characteristic, OrderType.RESET));
+//                        continue;
+//                    }
                 }
             }
         }

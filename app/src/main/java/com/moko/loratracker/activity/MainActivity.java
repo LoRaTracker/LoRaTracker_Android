@@ -389,32 +389,31 @@ public class MainActivity extends BaseActivity implements MokoScanDeviceCallback
                     int responseType = response.responseType;
                     byte[] value = response.responseValue;
                     switch (orderType) {
-                        case DEVICE_TYPE:
-                            if (value.length < 1)
-                                return;
-                            int type = (value[0] & 0xFF);
-                            if (type < 4 || type > 7) {
-                                deviceTypeErrorAlert();
-                                return;
-                            }
-                            dismissLoadingProgressDialog();
-                            Intent i = new Intent(MainActivity.this, DeviceInfoActivity.class);
-                            startActivityForResult(i, AppConstants.REQUEST_CODE_DEVICE_INFO);
-//                            rvDevices.postDelayed(() -> MokoSupport.getInstance().disConnectBle(), 3000);
-                            break;
+//                        case DEVICE_TYPE:
+//                            if (value.length < 1)
+//                                return;
+//                            int type = (value[0] & 0xFF);
+//                            if (type < 4 || type > 7) {
+//                                deviceTypeErrorAlert();
+//                                return;
+//                            }
+//                            dismissLoadingProgressDialog();
+//                            Intent i = new Intent(MainActivity.this, DeviceInfoActivity.class);
+//                            startActivityForResult(i, AppConstants.REQUEST_CODE_DEVICE_INFO);
+////                            rvDevices.postDelayed(() -> MokoSupport.getInstance().disConnectBle(), 3000);
+//                            break;
                         case PASSWORD:
                             dismissLoadingMessageDialog();
-                            if (value.length < 1)
+                            if (value.length < 2)
                                 return;
-                            showLoadingProgressDialog();
-                            if (0 == (value[0] & 0xFF)) {
+                            if (1 == (value[1] & 0xFF)) {
                                 mSavedPassword = mPassword;
                                 SPUtiles.setStringValue(MainActivity.this, AppConstants.SP_KEY_SAVED_PASSWORD, mSavedPassword);
                                 LogModule.i("Success");
-                                OrderTask orderTask = mMokoService.getDeviceType();
-                                MokoSupport.getInstance().sendOrder(orderTask);
+                                Intent i = new Intent(MainActivity.this, DeviceInfoActivity.class);
+                                startActivityForResult(i, AppConstants.REQUEST_CODE_DEVICE_INFO);
                             }
-                            if (1 == (value[0] & 0xFF)) {
+                            if (0 == (value[1] & 0xFF)) {
                                 ToastUtils.showToast(MainActivity.this, "Password Error");
                                 MokoSupport.getInstance().disConnectBle();
                             }
@@ -455,19 +454,14 @@ public class MainActivity extends BaseActivity implements MokoScanDeviceCallback
         }
         if (MokoConstants.ACTION_DISCOVER_SUCCESS.equals(action)) {
             dismissLoadingProgressDialog();
-            HashMap<OrderType, MokoCharacteristic> map = MokoCharacteristicHandler.getInstance().mokoCharacteristicMap;
-            if (map.containsKey(OrderType.DEVICE_TYPE)) {
-                showLoadingMessageDialog();
-                mMokoService.mHandler.postDelayed(() -> {
-                    // open password notify and set passwrord
-                    List<OrderTask> orderTasks = new ArrayList<>();
-                    orderTasks.add(mMokoService.openPasswordNotify());
-                    orderTasks.add(mMokoService.setPassword(mPassword));
-                    MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-                }, 500);
-                return;
-            }
-            deviceTypeErrorAlert();
+            showLoadingMessageDialog();
+            mMokoService.mHandler.postDelayed(() -> {
+                // open password notify and set passwrord
+                List<OrderTask> orderTasks = new ArrayList<>();
+                orderTasks.add(mMokoService.openPasswordNotify());
+                orderTasks.add(mMokoService.setPassword(mPassword));
+                MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            }, 500);
         }
     }
 

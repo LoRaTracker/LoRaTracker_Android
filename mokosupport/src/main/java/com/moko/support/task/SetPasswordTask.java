@@ -7,11 +7,17 @@ public class SetPasswordTask extends OrderTask {
     public byte[] data;
 
     public SetPasswordTask(MokoOrderTaskCallback callback) {
-        super(OrderType.PASSWORD, callback, OrderTask.RESPONSE_TYPE_WRITE);
+        super(OrderType.PASSWORD, callback, OrderTask.RESPONSE_TYPE_WRITE_NO_RESPONSE);
     }
 
     public void setData(String password) {
-        this.data = password.getBytes();
+        this.data = new byte[9];
+        byte[] passwordBytes = password.getBytes();
+        int length = passwordBytes.length;
+        data[0] = (byte) 0xED;
+        for (int i = 0; i < length; i++) {
+            data[i + 1] = passwordBytes[i];
+        }
     }
 
     @Override

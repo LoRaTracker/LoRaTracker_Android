@@ -416,9 +416,9 @@ public class MokoSupport implements MokoResponseCallback {
             if (characteristic.getUuid().toString().equals(OrderType.DISCONNECTED_NOTIFY.getUuid())) {
                 orderType = OrderType.DISCONNECTED_NOTIFY;
             }
-            if (characteristic.getUuid().toString().equals(OrderType.STORE_DATA_NOTIFY.getUuid())) {
-                orderType = OrderType.STORE_DATA_NOTIFY;
-            }
+//            if (characteristic.getUuid().toString().equals(OrderType.STORE_DATA_NOTIFY.getUuid())) {
+//                orderType = OrderType.STORE_DATA_NOTIFY;
+//            }
             if (orderType != null) {
                 LogModule.i(orderType.getName());
                 Intent intent = new Intent(MokoConstants.ACTION_CURRENT_DATA);
@@ -429,6 +429,12 @@ public class MokoSupport implements MokoResponseCallback {
         } else {
             OrderTask orderTask = mQueue.peek();
             if (value != null && value.length > 0 && orderTask != null) {
+                if (orderTask.orderType == OrderType.WRITE_CONFIG
+                        && 0xED == (value[0] & 0xFF)
+                        && 0x25 == (value[1] & 0xFF)) {
+                    orderTask.parseValue(value);
+                    return;
+                }
                 switch (orderTask.orderType) {
                     case WRITE_CONFIG:
                     case PASSWORD:
@@ -445,29 +451,29 @@ public class MokoSupport implements MokoResponseCallback {
         if (!isSyncData()) {
             return;
         }
-        OrderTask orderTask = mQueue.peek();
-        if (value != null && value.length > 0
-                && orderTask.response.responseType == OrderTask.RESPONSE_TYPE_WRITE) {
-            String assembleValue = MokoUtils.bytesToHexString(orderTask.assemble());
-            String valueStr = MokoUtils.bytesToHexString(value);
-            if (!assembleValue.equals(valueStr))
-                return;
-            switch (orderTask.orderType) {
-                case UUID:
-                case MAJOR:
-                case MINOR:
-                case MEASURE_POWER:
-                case TRANSMISSION:
-                case ADV_INTERVAL:
-                case DEVICE_NAME:
-                case SCAN_MODE:
-                case CONNECTION_MODE:
-                case STORE_ALERT:
-                case RESET:
-                    formatCommonOrder(orderTask, value);
-                    break;
-            }
-        }
+//        OrderTask orderTask = mQueue.peek();
+//        if (value != null && value.length > 0
+//                && orderTask.response.responseType == OrderTask.RESPONSE_TYPE_WRITE) {
+//            String assembleValue = MokoUtils.bytesToHexString(orderTask.assemble());
+//            String valueStr = MokoUtils.bytesToHexString(value);
+//            if (!assembleValue.equals(valueStr))
+//                return;
+//            switch (orderTask.orderType) {
+//                case UUID:
+//                case MAJOR:
+//                case MINOR:
+//                case MEASURE_POWER:
+//                case TRANSMISSION:
+//                case ADV_INTERVAL:
+//                case DEVICE_NAME:
+//                case SCAN_MODE:
+//                case CONNECTION_MODE:
+//                case STORE_ALERT:
+//                case RESET:
+//                    formatCommonOrder(orderTask, value);
+//                    break;
+//            }
+//        }
     }
 
     @Override
@@ -484,18 +490,17 @@ public class MokoSupport implements MokoResponseCallback {
                 case HARDWARE_VERSION:
                 case SOFTWARE_VERSION:
                 case MANUFACTURER:
-                case DEVICE_TYPE:
-                case UUID:
-                case MAJOR:
-                case MINOR:
-                case MEASURE_POWER:
-                case TRANSMISSION:
-                case ADV_INTERVAL:
-                case DEVICE_NAME:
-                case BATTERY:
-                case SCAN_MODE:
-                case CONNECTION_MODE:
-                case STORE_ALERT:
+//                case UUID:
+//                case MAJOR:
+//                case MINOR:
+//                case MEASURE_POWER:
+//                case TRANSMISSION:
+//                case ADV_INTERVAL:
+//                case DEVICE_NAME:
+//                case BATTERY:
+//                case SCAN_MODE:
+//                case CONNECTION_MODE:
+//                case STORE_ALERT:
                     formatCommonOrder(orderTask, value);
                     break;
             }
@@ -515,7 +520,7 @@ public class MokoSupport implements MokoResponseCallback {
     }
 
     @Override
-    public void onBatteryValueReceived(BluetoothGatt gatt) {
+    public void onServicesDiscovered(BluetoothGatt gatt) {
         mBluetoothGatt = gatt;
         mCharacteristicMap = MokoCharacteristicHandler.getInstance().getCharacteristics(gatt);
         ConnectStatusEvent connectStatusEvent = new ConnectStatusEvent();
@@ -550,13 +555,13 @@ public class MokoSupport implements MokoResponseCallback {
         mHandler.postDelayed(orderTask.timeoutRunner, orderTask.delayTime);
     }
 
-    public void enableStoreDataNotify() {
-        mokoBleManager.enableStoreDataNotify();
-    }
+    public String filterRawData;
 
-    public void disableStoreDataNotify() {
-        mokoBleManager.disableStoreDataNotify();
-    }
-
-    public int firmwareVersion;
+//    public void enableStoreDataNotify() {
+//        mokoBleManager.enableStoreDataNotify();
+//    }
+//
+//    public void disableStoreDataNotify() {
+//        mokoBleManager.disableStoreDataNotify();
+//    }
 }

@@ -19,7 +19,7 @@ public class BeaconListAdapter extends BaseQuickAdapter<BeaconInfo, BaseViewHold
         final String name = TextUtils.isEmpty(item.name) ? "N/A" : item.name;
         helper.setText(R.id.tv_name, name);
         helper.setText(R.id.tv_mac, String.format("MAC:%s", item.mac));
-        helper.setText(R.id.tv_battery, String.format("%dmV", item.battery));
+        helper.setText(R.id.tv_battery, String.format("%d%%", item.battery));
         final String txPower = String.format("Tx Power:%ddBm", item.txPower);
         helper.setText(R.id.tv_tx_power, txPower);
         helper.setVisible(R.id.tv_connect, item.connectable == 1);

@@ -2,6 +2,7 @@ package com.moko.loratracker.entity;
 
 public class BeaconInfo {
     public String name;
+    public int deviceType;
     public int rssi;
     public String mac;
     public int battery;

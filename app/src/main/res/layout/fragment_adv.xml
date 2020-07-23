@@ -205,7 +205,6 @@
             app:layout_constraintTop_toTopOf="@id/et_adv_interval" />
 
         <TextView
-            android:id="@+id/adv_interval_range"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
@@ -333,91 +332,5 @@
             app:layout_constraintLeft_toRightOf="@id/sb_tx_power"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="@id/sb_tx_power" />
-
-        <View
-            style="@style/divider_line"
-            android:layout_width="0dp"
-            android:layout_marginTop="10dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/sb_tx_power" />
-
-        <TextView
-            android:id="@+id/adv_trigger"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:text="ADV Trigger"
-            android:textColor="@color/black_333333"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/sb_tx_power" />
-
-        <ImageView
-            android:id="@+id/iv_adv_trigger"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:src="@drawable/ic_unchecked"
-            app:layout_constraintBottom_toBottomOf="@id/adv_trigger"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@id/adv_trigger" />
-
-        <android.support.constraint.ConstraintLayout
-            android:id="@+id/cl_adv_trigger"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_adv_trigger">
-
-            <TextView
-                android:id="@+id/adv_trigger_tips"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="The Beacon will stop advertising after static period of"
-                android:textColor="@color/black_333333"
-                android:textSize="15sp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <EditText
-                android:id="@+id/et_adv_trigger"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:maxLength="5"
-                android:text=""
-                android:textColor="@color/black_333333"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/adv_trigger_tips" />
-
-            <TextView
-                android:id="@+id/adv_trigger_range"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="(1~65535)"
-                android:textColor="@color/grey_b3b3b3"
-                android:textSize="15sp"
-                app:layout_constraintBaseline_toBaselineOf="@id/et_adv_trigger"
-                app:layout_constraintLeft_toRightOf="@id/et_adv_trigger" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:text="seconds."
-                android:textColor="@color/black_333333"
-                android:textSize="15sp"
-                app:layout_constraintBaseline_toBaselineOf="@id/adv_trigger_range"
-                app:layout_constraintLeft_toRightOf="@id/adv_trigger_range" />
-        </android.support.constraint.ConstraintLayout>
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

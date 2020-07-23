@@ -53,14 +53,6 @@ public class AdvFragment extends Fragment implements SeekBar.OnSeekBarChangeList
     SeekBar sbTxPower;
     @Bind(R.id.tv_tx_power_value)
     TextView tvTxPowerValue;
-    @Bind(R.id.iv_adv_trigger)
-    ImageView ivAdvTrigger;
-    @Bind(R.id.et_adv_trigger)
-    EditText etAdvTrigger;
-    @Bind(R.id.cl_adv_trigger)
-    ConstraintLayout clAdvTrigger;
-    @Bind(R.id.adv_trigger)
-    TextView advTrigger;
 
 
     private Pattern pattern;
@@ -241,45 +233,12 @@ public class AdvFragment extends Fragment implements SeekBar.OnSeekBarChangeList
         tvTxPowerValue.setText(String.format("%ddBm", txPower));
     }
 
-    private boolean isAdvTriggerOpen;
-
-    public void setAdvTriggerClose() {
-        isAdvTriggerOpen = false;
-        ivAdvTrigger.setImageResource(R.drawable.ic_unchecked);
-        clAdvTrigger.setVisibility(View.GONE);
-    }
-
-    public void setAdvTrigger(int duration) {
-        isAdvTriggerOpen = true;
-        ivAdvTrigger.setImageResource(R.drawable.ic_checked);
-        clAdvTrigger.setVisibility(View.VISIBLE);
-        etAdvTrigger.setText(String.valueOf(duration));
-        etAdvTrigger.setSelection(String.valueOf(duration).length());
-    }
-
-    public void disableTrigger() {
-        advTrigger.setVisibility(View.GONE);
-        ivAdvTrigger.setVisibility(View.GONE);
-    }
-
-    @OnClick({R.id.iv_adv_trigger})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.iv_adv_trigger:
-                isAdvTriggerOpen = !isAdvTriggerOpen;
-                ivAdvTrigger.setImageResource(isAdvTriggerOpen ? R.drawable.ic_checked : R.drawable.ic_unchecked);
-                clAdvTrigger.setVisibility(isAdvTriggerOpen ? View.VISIBLE : View.GONE);
-                break;
-        }
-    }
-
     public boolean isValid() {
         final String advNameStr = etAdvName.getText().toString();
         final String uuidStr = etUuid.getText().toString();
         final String majorStr = etMajor.getText().toString();
         final String minorStr = etMinor.getText().toString();
         final String advIntervalStr = etAdvInterval.getText().toString();
-        final String advTriggerStr = etAdvTrigger.getText().toString();
         if (TextUtils.isEmpty(advNameStr))
             return false;
         if (TextUtils.isEmpty(uuidStr) || uuidStr.length() != 36)
@@ -299,13 +258,6 @@ public class AdvFragment extends Fragment implements SeekBar.OnSeekBarChangeList
         int advInterval = Integer.parseInt(advIntervalStr);
         if (advInterval < 1 || advInterval > 100)
             return false;
-        if (isAdvTriggerOpen) {
-            if (TextUtils.isEmpty(advTriggerStr))
-                return false;
-            int advTrigger = Integer.parseInt(advTriggerStr);
-            if (advTrigger < 1 || advTrigger > 65535)
-                return false;
-        }
         return true;
     }
 
@@ -316,7 +268,6 @@ public class AdvFragment extends Fragment implements SeekBar.OnSeekBarChangeList
         final String majorStr = etMajor.getText().toString();
         final String minorStr = etMinor.getText().toString();
         final String advIntervalStr = etAdvInterval.getText().toString();
-        final String advTriggerStr = etAdvTrigger.getText().toString();
         List<OrderTask> orderTasks = new ArrayList<>();
 
         orderTasks.add(mokoService.setDeviceName(advNameStr));
@@ -340,13 +291,6 @@ public class AdvFragment extends Fragment implements SeekBar.OnSeekBarChangeList
         int txPowerProgress = sbTxPower.getProgress();
         int txPower = TxPowerEnum.fromOrdinal(txPowerProgress).getTxPower();
         orderTasks.add(mokoService.setTransmission(txPower));
-
-        if (isAdvTriggerOpen) {
-            int advTrigger = Integer.parseInt(advTriggerStr);
-            orderTasks.add(mokoService.setAdvMoveCondition(advTrigger));
-        } else {
-            orderTasks.add(mokoService.setAdvMoveCondition(0));
-        }
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 }
