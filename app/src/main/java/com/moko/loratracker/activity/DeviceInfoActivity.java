@@ -7,15 +7,12 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.IdRes;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
@@ -38,14 +35,15 @@ import com.moko.loratracker.fragment.DeviceFragment;
 import com.moko.loratracker.fragment.ScannerFragment;
 import com.moko.loratracker.fragment.SettingFragment;
 import com.moko.loratracker.service.DfuService;
-import com.moko.loratracker.service.MokoService;
 import com.moko.loratracker.utils.FileUtils;
 import com.moko.loratracker.utils.ToastUtils;
 import com.moko.support.MokoConstants;
 import com.moko.support.MokoSupport;
+import com.moko.support.OrderTaskAssembler;
 import com.moko.support.entity.ConfigKeyEnum;
 import com.moko.support.entity.OrderType;
 import com.moko.support.event.ConnectStatusEvent;
+import com.moko.support.event.OrderTaskResponseEvent;
 import com.moko.support.log.LogModule;
 import com.moko.support.task.OrderTask;
 import com.moko.support.task.OrderTaskResponse;
@@ -94,7 +92,6 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     private DeviceFragment deviceFragment;
     public String mDeviceMac;
     public String mDeviceName;
-    public MokoService mMokoService;
     private boolean mReceiverTag = false;
     private int disConnectType;
 
@@ -105,13 +102,34 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         ButterKnife.bind(this);
         fragmentManager = getFragmentManager();
         initFragment();
-
-        Intent intent = new Intent(this, MokoService.class);
-        bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
         radioBtnAdv.setChecked(true);
         tvTitle.setText(R.string.title_advertiser);
         rgOptions.setOnCheckedChangeListener(this);
         EventBus.getDefault().register(this);
+        // 注册广播接收器
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        registerReceiver(mReceiver, filter);
+        mReceiverTag = true;
+        if (!MokoSupport.getInstance().isBluetoothOpen()) {
+            MokoSupport.getInstance().enableBluetooth();
+        } else {
+            showSyncingProgressDialog();
+            List<OrderTask> orderTasks = new ArrayList<>();
+            // sync time after connect success;
+            orderTasks.add(OrderTaskAssembler.openDisconnectedNotify());
+            orderTasks.add(OrderTaskAssembler.openWriteConfigNotify());
+            orderTasks.add(OrderTaskAssembler.setTime());
+            // get adv params
+            orderTasks.add(OrderTaskAssembler.getAdvName());
+            orderTasks.add(OrderTaskAssembler.getiBeaconUUID());
+            orderTasks.add(OrderTaskAssembler.getiBeaconMajor());
+            orderTasks.add(OrderTaskAssembler.getIBeaconMinor());
+            orderTasks.add(OrderTaskAssembler.getAdvInterval());
+            orderTasks.add(OrderTaskAssembler.getTransmission());
+            orderTasks.add(OrderTaskAssembler.getMeasurePower());
+            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+        }
     }
 
     private void initFragment() {
@@ -131,66 +149,216 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                 .commit();
     }
 
-    private ServiceConnection mServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mMokoService = ((MokoService.LocalBinder) service).getService();
-            // 注册广播接收器
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(MokoConstants.ACTION_ORDER_RESULT);
-            filter.addAction(MokoConstants.ACTION_ORDER_TIMEOUT);
-            filter.addAction(MokoConstants.ACTION_ORDER_FINISH);
-            filter.addAction(MokoConstants.ACTION_CURRENT_DATA);
-            filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-            filter.setPriority(200);
-            registerReceiver(mReceiver, filter);
-            mReceiverTag = true;
-            if (!MokoSupport.getInstance().isBluetoothOpen()) {
-                MokoSupport.getInstance().enableBluetooth();
-            } else {
-                if (mMokoService == null) {
-                    finish();
-                    return;
-                }
-                showSyncingProgressDialog();
-                List<OrderTask> orderTasks = new ArrayList<>();
-                // sync time after connect success;
-                orderTasks.add(mMokoService.openDisconnectedNotify());
-                orderTasks.add(mMokoService.openWriteConfigNotify());
-                orderTasks.add(mMokoService.setTime());
-                // get adv params
-                orderTasks.add(mMokoService.getAdvName());
-                orderTasks.add(mMokoService.getiBeaconUUID());
-                orderTasks.add(mMokoService.getiBeaconMajor());
-                orderTasks.add(mMokoService.getIBeaconMinor());
-                orderTasks.add(mMokoService.getAdvInterval());
-                orderTasks.add(mMokoService.getTransmission());
-                orderTasks.add(mMokoService.getMeasurePower());
-                MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-        }
-    };
-
     @Subscribe(threadMode = ThreadMode.POSTING, priority = 100)
     public void onConnectStatusEvent(ConnectStatusEvent event) {
         EventBus.getDefault().cancelEventDelivery(event);
         final String action = event.getAction();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (MokoConstants.ACTION_CONN_STATUS_DISCONNECTED.equals(action)) {
-                    showDisconnectDialog();
-                }
-                if (MokoConstants.ACTION_DISCOVER_SUCCESS.equals(action)) {
-                }
+        runOnUiThread(() -> {
+            if (MokoConstants.ACTION_CONN_STATUS_DISCONNECTED.equals(action)) {
+                showDisconnectDialog();
+            }
+            if (MokoConstants.ACTION_DISCOVER_SUCCESS.equals(action)) {
             }
         });
 
+    }
+
+    @Subscribe(threadMode = ThreadMode.POSTING, priority = 100)
+    public void onOrderTaskResponseEvent(OrderTaskResponseEvent event) {
+        EventBus.getDefault().cancelEventDelivery(event);
+        final String action = event.getAction();
+        runOnUiThread(() -> {
+            if (MokoConstants.ACTION_CURRENT_DATA.equals(action)) {
+                OrderTaskResponse response = event.getResponse();
+                OrderType orderType = response.orderType;
+                int responseType = response.responseType;
+                byte[] value = response.responseValue;
+                switch (orderType) {
+                    case DISCONNECTED_NOTIFY:
+                        int type = value[1] & 0xFF;
+                        disConnectType = type;
+                        if (type == 1) {
+                            // valid password timeout
+                        } else if (type == 2) {
+                            // change password success
+                        } else if (type == 3) {
+                            // reset success
+                        } else if (type == 4) {
+                            // no data exchange timeout
+                        } else if (type == 5) {
+                            // close device
+                        }
+                        break;
+                }
+            }
+            if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
+            }
+            if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
+                dismissSyncProgressDialog();
+            }
+            if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
+                OrderTaskResponse response = event.getResponse();
+                OrderType orderType = response.orderType;
+                int responseType = response.responseType;
+                byte[] value = response.responseValue;
+                switch (orderType) {
+                    case DEVICE_MODEL:
+                        String productModel = new String(value);
+                        deviceFragment.setProductModel(productModel);
+                        break;
+                    case SOFTWARE_VERSION:
+                        String softwareVersion = new String(value);
+                        deviceFragment.setSoftwareVersion(softwareVersion);
+                        break;
+                    case FIRMWARE_VERSION:
+                        String firmwareVersion = new String(value);
+                        deviceFragment.setFirmwareVersion(firmwareVersion);
+                        break;
+                    case HARDWARE_VERSION:
+                        String hardwareVersion = new String(value);
+                        deviceFragment.setHardwareVersion(hardwareVersion);
+                        break;
+                    case PRODUCT_DATE:
+                        String manufactureDate = new String(value);
+                        deviceFragment.setManufactureDate(manufactureDate);
+                        break;
+                    case MANUFACTURER:
+                        String manufacture = new String(value);
+                        deviceFragment.setManufacture(manufacture);
+                        break;
+                    case WRITE_CONFIG:
+                        if (value.length >= 2) {
+                            int key = value[1] & 0xFF;
+                            ConfigKeyEnum configKeyEnum = ConfigKeyEnum.fromConfigKey(key);
+                            if (configKeyEnum == null) {
+                                return;
+                            }
+                            int length = value[2] & 0xFF;
+                            switch (configKeyEnum) {
+                                case GET_ADV_NAME:
+                                    if (length > 0) {
+                                        byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
+                                        final String deviceName = new String(rawDataBytes);
+                                        mDeviceName = deviceName;
+                                        advFragment.setDeviceName(deviceName);
+                                    }
+                                    break;
+                                case GET_IBEACON_UUID:
+                                    if (length > 0) {
+                                        byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
+                                        final String uuid = MokoUtils.bytesToHexString(rawDataBytes);
+                                        advFragment.setUUID(uuid);
+                                    }
+                                    break;
+                                case GET_IBEACON_MAJOR:
+                                    if (length > 0) {
+                                        byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
+                                        final int major = MokoUtils.toInt(rawDataBytes);
+                                        advFragment.setMajor(major);
+                                    }
+                                    break;
+                                case GET_IBEACON_MINOR:
+                                    if (length > 0) {
+                                        byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
+                                        final int minor = MokoUtils.toInt(rawDataBytes);
+                                        advFragment.setMinor(minor);
+                                    }
+                                    break;
+                                case GET_ADV_INTERVAL:
+                                    if (length > 0) {
+                                        byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
+                                        final int advInterval = MokoUtils.toInt(rawDataBytes);
+                                        advFragment.setAdvInterval(advInterval);
+                                    }
+                                    break;
+                                case GET_MEASURE_POWER:
+                                    if (length > 0) {
+                                        int rssi_1m = value[3];
+                                        advFragment.setMeasurePower(rssi_1m);
+                                    }
+                                    break;
+                                case GET_TRANSMISSION:
+                                    if (length > 0) {
+                                        int txPower = value[3];
+                                        advFragment.setTransmission(txPower);
+                                    }
+                                    break;
+                                case GET_SCAN_INTERVAL:
+                                    if (length > 0) {
+                                        byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
+                                        final int scannInterval = MokoUtils.toInt(rawDataBytes);
+                                        scannerFragment.setScanInterval(scannInterval);
+                                    }
+                                    break;
+                                case GET_ALARM_NOTIFY:
+                                    if (length > 0) {
+                                        int notify = value[3] & 0xFF;
+                                        scannerFragment.setAlarmNotify(notify);
+                                    }
+                                    break;
+                                case GET_ALARM_RSSI:
+                                    if (length > 0) {
+                                        int rssi = value[3];
+                                        scannerFragment.setAlarmTriggerRssi(rssi);
+                                    }
+                                    break;
+                                case GET_LORA_CONNECTABLE:
+                                    if (length > 0) {
+                                        int connectable = value[3];
+                                        settingFragment.setLoRaConnectable(connectable);
+                                    }
+                                    break;
+                                case GET_SCAN_WINDOW:
+                                    if (length > 0) {
+                                        int scannerState = value[3] & 0xFF;
+                                        int startTime = value[4] & 0xFF;
+                                        settingFragment.setScanWindow(scannerState, startTime);
+                                    }
+                                    break;
+                                case GET_CONNECTABLE:
+                                    if (length > 0) {
+                                        int connectable = value[3] & 0xFF;
+                                        settingFragment.setConnectable(connectable);
+                                    }
+                                    break;
+                                case GET_DEVICE_MAC:
+                                    if (length > 0) {
+                                        byte[] macBytes = Arrays.copyOfRange(value, 3, 3 + length);
+                                        StringBuffer stringBuffer = new StringBuffer();
+                                        for (int i = 0, l = macBytes.length; i < l; i++) {
+                                            stringBuffer.append(MokoUtils.byte2HexString(macBytes[i]));
+                                            if (i < (l - 1))
+                                                stringBuffer.append(":");
+                                        }
+                                        mDeviceMac = stringBuffer.toString();
+                                        deviceFragment.setMacAddress(stringBuffer.toString());
+                                    }
+                                    break;
+                                case GET_BATTERY:
+                                    if (length > 0) {
+                                        int battery = value[3] & 0xFF;
+                                        deviceFragment.setBatteryValtage(battery);
+                                    }
+                                    break;
+                                case SET_TRANSMISSION:
+                                case SET_ALARM_RSSI:
+                                    if (length > 0) {
+                                        int result = value[3];
+                                        if (result == 0)
+                                            return;
+                                        AlertMessageDialog dialog = new AlertMessageDialog();
+                                        dialog.setMessage("Saved Successfully！");
+                                        dialog.setConfirm("OK");
+                                        dialog.setCancelGone();
+                                        dialog.show(getSupportFragmentManager());
+                                    }
+                                    break;
+                            }
+                        }
+                        break;
+                }
+            }
+        });
     }
 
     private void showDisconnectDialog() {
@@ -259,197 +427,6 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
             if (intent != null) {
                 String action = intent.getAction();
-                if (!BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
-                    abortBroadcast();
-                }
-                if (MokoConstants.ACTION_CURRENT_DATA.equals(action)) {
-                    OrderType orderType = (OrderType) intent.getSerializableExtra(MokoConstants.EXTRA_KEY_CURRENT_DATA_TYPE);
-                    byte[] value = intent.getByteArrayExtra(MokoConstants.EXTRA_KEY_RESPONSE_VALUE);
-                    switch (orderType) {
-                        case DISCONNECTED_NOTIFY:
-                            int type = value[1] & 0xFF;
-                            disConnectType = type;
-                            if (type == 1) {
-                                // valid password timeout
-                            } else if (type == 2) {
-                                // change password success
-                            } else if (type == 3) {
-                                // reset success
-                            } else if (type == 4) {
-                                // no data exchange timeout
-                            } else if (type == 5) {
-                                // close device
-                            }
-                            break;
-                    }
-                }
-                if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
-                }
-                if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
-                    dismissSyncProgressDialog();
-                }
-                if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
-                    OrderTaskResponse response = (OrderTaskResponse) intent.getSerializableExtra(MokoConstants.EXTRA_KEY_RESPONSE_ORDER_TASK);
-                    OrderType orderType = response.orderType;
-                    int responseType = response.responseType;
-                    byte[] value = response.responseValue;
-                    switch (orderType) {
-                        case DEVICE_MODEL:
-                            String productModel = new String(value);
-                            deviceFragment.setProductModel(productModel);
-                            break;
-                        case SOFTWARE_VERSION:
-                            String softwareVersion = new String(value);
-                            deviceFragment.setSoftwareVersion(softwareVersion);
-                            break;
-                        case FIRMWARE_VERSION:
-                            String firmwareVersion = new String(value);
-                            deviceFragment.setFirmwareVersion(firmwareVersion);
-                            break;
-                        case HARDWARE_VERSION:
-                            String hardwareVersion = new String(value);
-                            deviceFragment.setHardwareVersion(hardwareVersion);
-                            break;
-                        case PRODUCT_DATE:
-                            String manufactureDate = new String(value);
-                            deviceFragment.setManufactureDate(manufactureDate);
-                            break;
-                        case MANUFACTURER:
-                            String manufacture = new String(value);
-                            deviceFragment.setManufacture(manufacture);
-                            break;
-                        case WRITE_CONFIG:
-                            if (value.length >= 2) {
-                                int key = value[1] & 0xFF;
-                                ConfigKeyEnum configKeyEnum = ConfigKeyEnum.fromConfigKey(key);
-                                if (configKeyEnum == null) {
-                                    return;
-                                }
-                                int length = value[2] & 0xFF;
-                                switch (configKeyEnum) {
-                                    case GET_ADV_NAME:
-                                        if (length > 0) {
-                                            byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
-                                            final String deviceName = new String(rawDataBytes);
-                                            mDeviceName = deviceName;
-                                            advFragment.setDeviceName(deviceName);
-                                        }
-                                        break;
-                                    case GET_IBEACON_UUID:
-                                        if (length > 0) {
-                                            byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
-                                            final String uuid = MokoUtils.bytesToHexString(rawDataBytes);
-                                            advFragment.setUUID(uuid);
-                                        }
-                                        break;
-                                    case GET_IBEACON_MAJOR:
-                                        if (length > 0) {
-                                            byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
-                                            final int major = MokoUtils.toInt(rawDataBytes);
-                                            advFragment.setMajor(major);
-                                        }
-                                        break;
-                                    case GET_IBEACON_MINOR:
-                                        if (length > 0) {
-                                            byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
-                                            final int minor = MokoUtils.toInt(rawDataBytes);
-                                            advFragment.setMinor(minor);
-                                        }
-                                        break;
-                                    case GET_ADV_INTERVAL:
-                                        if (length > 0) {
-                                            byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
-                                            final int advInterval = MokoUtils.toInt(rawDataBytes);
-                                            advFragment.setAdvInterval(advInterval);
-                                        }
-                                        break;
-                                    case GET_MEASURE_POWER:
-                                        if (length > 0) {
-                                            int rssi_1m = value[3];
-                                            advFragment.setMeasurePower(rssi_1m);
-                                        }
-                                        break;
-                                    case GET_TRANSMISSION:
-                                        if (length > 0) {
-                                            int txPower = value[3];
-                                            advFragment.setTransmission(txPower);
-                                        }
-                                        break;
-                                    case GET_SCAN_INTERVAL:
-                                        if (length > 0) {
-                                            byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
-                                            final int scannInterval = MokoUtils.toInt(rawDataBytes);
-                                            scannerFragment.setScanInterval(scannInterval);
-                                        }
-                                        break;
-                                    case GET_ALARM_NOTIFY:
-                                        if (length > 0) {
-                                            int notify = value[3] & 0xFF;
-                                            scannerFragment.setAlarmNotify(notify);
-                                        }
-                                        break;
-                                    case GET_ALARM_RSSI:
-                                        if (length > 0) {
-                                            int rssi = value[3];
-                                            scannerFragment.setAlarmTriggerRssi(rssi);
-                                        }
-                                        break;
-                                    case GET_LORA_CONNECTABLE:
-                                        if (length > 0) {
-                                            int connectable = value[3];
-                                            settingFragment.setLoRaConnectable(connectable);
-                                        }
-                                        break;
-                                    case GET_SCAN_WINDOW:
-                                        if (length > 0) {
-                                            int scannerState = value[3] & 0xFF;
-                                            int startTime = value[4] & 0xFF;
-                                            settingFragment.setScanWindow(scannerState, startTime);
-                                        }
-                                        break;
-                                    case GET_CONNECTABLE:
-                                        if (length > 0) {
-                                            int connectable = value[3] & 0xFF;
-                                            settingFragment.setConnectable(connectable);
-                                        }
-                                        break;
-                                    case GET_DEVICE_MAC:
-                                        if (length > 0) {
-                                            byte[] macBytes = Arrays.copyOfRange(value, 3, 3 + length);
-                                            StringBuffer stringBuffer = new StringBuffer();
-                                            for (int i = 0, l = macBytes.length; i < l; i++) {
-                                                stringBuffer.append(MokoUtils.byte2HexString(macBytes[i]));
-                                                if (i < (l - 1))
-                                                    stringBuffer.append(":");
-                                            }
-                                            mDeviceMac = stringBuffer.toString();
-                                            deviceFragment.setMacAddress(stringBuffer.toString());
-                                        }
-                                        break;
-                                    case GET_BATTERY:
-                                        if (length > 0) {
-                                            int battery = value[3] & 0xFF;
-                                            deviceFragment.setBatteryValtage(battery);
-                                        }
-                                        break;
-                                    case SET_TRANSMISSION:
-                                    case SET_ALARM_RSSI:
-                                        if (length > 0) {
-                                            int result = value[3];
-                                            if (result == 0)
-                                                return;
-                                            AlertMessageDialog dialog = new AlertMessageDialog();
-                                            dialog.setMessage("Saved Successfully！");
-                                            dialog.setConfirm("OK");
-                                            dialog.setCancelGone();
-                                            dialog.show(getSupportFragmentManager());
-                                        }
-                                        break;
-                                }
-                            }
-                            break;
-                    }
-                }
                 if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                     int blueState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
                     switch (blueState) {
@@ -499,13 +476,15 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                 }
             }
         } else if (requestCode == AppConstants.REQUEST_CODE_LORA_SETTING) {
-            ivSave.postDelayed(() -> {
-                showSyncingProgressDialog();
-                List<OrderTask> orderTasks = new ArrayList<>();
-                // setting
-                orderTasks.add(mMokoService.getLoRaConnectable());
-                MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-            }, 500);
+            if (resultCode == RESULT_OK) {
+                ivSave.postDelayed(() -> {
+                    showSyncingProgressDialog();
+                    List<OrderTask> orderTasks = new ArrayList<>();
+                    // setting
+                    orderTasks.add(OrderTaskAssembler.getLoRaConnectable());
+                    MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+                }, 500);
+            }
         }
     }
 
@@ -517,7 +496,6 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             // 注销广播
             unregisterReceiver(mReceiver);
         }
-        unbindService(mServiceConnection);
         EventBus.getDefault().unregister(this);
     }
 
@@ -545,14 +523,14 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                 if (radioBtnAdv.isChecked()) {
                     if (advFragment.isValid()) {
                         showSyncingProgressDialog();
-                        advFragment.saveParams(mMokoService);
+                        advFragment.saveParams();
                     } else {
                         ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
                     }
                 }
                 if (radioBtnScanner.isChecked()) {
                     showSyncingProgressDialog();
-                    scannerFragment.saveParams(mMokoService);
+                    scannerFragment.saveParams();
                 }
                 break;
         }
@@ -602,14 +580,14 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>();
         // device
-        orderTasks.add(mMokoService.getBattery());
-        orderTasks.add(mMokoService.getMacAddress());
-        orderTasks.add(mMokoService.getDeviceModel());
-        orderTasks.add(mMokoService.getSoftwareVersion());
-        orderTasks.add(mMokoService.getFirmwareVersion());
-        orderTasks.add(mMokoService.getHardwareVersion());
-        orderTasks.add(mMokoService.getProductDate());
-        orderTasks.add(mMokoService.getManufacturer());
+        orderTasks.add(OrderTaskAssembler.getBattery());
+        orderTasks.add(OrderTaskAssembler.getMacAddress());
+        orderTasks.add(OrderTaskAssembler.getDeviceModel());
+        orderTasks.add(OrderTaskAssembler.getSoftwareVersion());
+        orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
+        orderTasks.add(OrderTaskAssembler.getHardwareVersion());
+        orderTasks.add(OrderTaskAssembler.getProductDate());
+        orderTasks.add(OrderTaskAssembler.getManufacturer());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
@@ -625,9 +603,9 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>();
         // setting
-        orderTasks.add(mMokoService.getLoRaConnectable());
-        orderTasks.add(mMokoService.getScanWindow());
-        orderTasks.add(mMokoService.getConnectable());
+        orderTasks.add(OrderTaskAssembler.getLoRaConnectable());
+        orderTasks.add(OrderTaskAssembler.getScanWindow());
+        orderTasks.add(OrderTaskAssembler.getConnectable());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
@@ -643,9 +621,9 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>();
         // scanner
-        orderTasks.add(mMokoService.getScanInterval());
-        orderTasks.add(mMokoService.getAlarmNotify());
-        orderTasks.add(mMokoService.getAlarmRssi());
+        orderTasks.add(OrderTaskAssembler.getScanInterval());
+        orderTasks.add(OrderTaskAssembler.getAlarmNotify());
+        orderTasks.add(OrderTaskAssembler.getAlarmRssi());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
@@ -661,40 +639,40 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>();
         // get adv params
-        orderTasks.add(mMokoService.getAdvName());
-        orderTasks.add(mMokoService.getiBeaconUUID());
-        orderTasks.add(mMokoService.getiBeaconMajor());
-        orderTasks.add(mMokoService.getIBeaconMinor());
-        orderTasks.add(mMokoService.getAdvInterval());
-        orderTasks.add(mMokoService.getTransmission());
-        orderTasks.add(mMokoService.getMeasurePower());
+        orderTasks.add(OrderTaskAssembler.getAdvName());
+        orderTasks.add(OrderTaskAssembler.getiBeaconUUID());
+        orderTasks.add(OrderTaskAssembler.getiBeaconMajor());
+        orderTasks.add(OrderTaskAssembler.getIBeaconMinor());
+        orderTasks.add(OrderTaskAssembler.getAdvInterval());
+        orderTasks.add(OrderTaskAssembler.getTransmission());
+        orderTasks.add(OrderTaskAssembler.getMeasurePower());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
 
     public void changePassword(String password) {
         showSyncingProgressDialog();
-        MokoSupport.getInstance().sendOrder(mMokoService.changePassword(password));
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.changePassword(password));
     }
 
     public void reset() {
         showSyncingProgressDialog();
-        MokoSupport.getInstance().sendOrder(mMokoService.setReset());
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setReset());
     }
 
     public void setScanWindow(int scannerState, int startTime) {
         showSyncingProgressDialog();
-        MokoSupport.getInstance().sendOrder(mMokoService.setScanWindow(scannerState, startTime));
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setScanWindow(scannerState, startTime));
     }
 
     public void changeConnectState(int connectState) {
         showSyncingProgressDialog();
-        MokoSupport.getInstance().sendOrder(mMokoService.setConnectionMode(connectState), mMokoService.getConnectable());
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setConnectionMode(connectState), OrderTaskAssembler.getConnectable());
     }
 
     public void powerOff() {
         showSyncingProgressDialog();
-        MokoSupport.getInstance().sendOrder(mMokoService.closePower());
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.closePower());
     }
 
     public void chooseFirmwareFile() {

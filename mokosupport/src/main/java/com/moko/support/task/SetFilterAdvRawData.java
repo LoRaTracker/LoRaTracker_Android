@@ -1,12 +1,14 @@
 package com.moko.support.task;
 
+import com.moko.support.MokoConstants;
 import com.moko.support.MokoSupport;
-import com.moko.support.callback.MokoOrderTaskCallback;
 import com.moko.support.entity.OrderType;
+import com.moko.support.event.OrderTaskResponseEvent;
 import com.moko.support.utils.MokoUtils;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class SetFilterAdvRawData extends OrderTask {
     public byte[] data;
@@ -14,8 +16,8 @@ public class SetFilterAdvRawData extends OrderTask {
     private int index;
     private int size;
 
-    public SetFilterAdvRawData(ArrayList<String> filterRawDatas, MokoOrderTaskCallback callback) {
-        super(OrderType.WRITE_CONFIG, callback, OrderTask.RESPONSE_TYPE_WRITE_NO_RESPONSE);
+    public SetFilterAdvRawData(ArrayList<String> filterRawDatas) {
+        super(OrderType.WRITE_CONFIG, OrderTask.RESPONSE_TYPE_WRITE_NO_RESPONSE);
         mFilterRawDatas = filterRawDatas;
         if (filterRawDatas != null) {
             index = 0;
@@ -60,11 +62,15 @@ public class SetFilterAdvRawData extends OrderTask {
         orderStatus = OrderTask.ORDER_STATUS_SUCCESS;
         index++;
         if (index < size) {
-            MokoSupport.getInstance().executeTask(callback);
+            MokoSupport.getInstance().executeTask();
         } else {
             response.responseValue = value;
             MokoSupport.getInstance().pollTask();
-            callback.onOrderResult(response);
+            OrderTaskResponseEvent event = new OrderTaskResponseEvent();
+            event.setAction(MokoConstants.ACTION_ORDER_RESULT);
+            event.setResponse(response);
+            EventBus.getDefault().post(event);
+            MokoSupport.getInstance().executeTask();
         }
     }
 }

@@ -9,7 +9,6 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,16 +16,17 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
-import com.moko.support.callback.MokoOrderTaskCallback;
 import com.moko.support.callback.MokoResponseCallback;
 import com.moko.support.callback.MokoScanDeviceCallback;
 import com.moko.support.entity.MokoCharacteristic;
 import com.moko.support.entity.OrderType;
 import com.moko.support.event.ConnectStatusEvent;
+import com.moko.support.event.OrderTaskResponseEvent;
 import com.moko.support.handler.MokoCharacteristicHandler;
 import com.moko.support.handler.MokoLeScanHandler;
 import com.moko.support.log.LogModule;
 import com.moko.support.task.OrderTask;
+import com.moko.support.task.OrderTaskResponse;
 import com.moko.support.utils.MokoUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -236,7 +236,7 @@ public class MokoSupport implements MokoResponseCallback {
                 }
                 mQueue.offer(ordertask);
             }
-            executeTask(null);
+            executeTask();
         } else {
             for (OrderTask ordertask : orderTasks) {
                 if (ordertask == null) {
@@ -247,9 +247,11 @@ public class MokoSupport implements MokoResponseCallback {
         }
     }
 
-    public void executeTask(MokoOrderTaskCallback callback) {
-        if (callback != null && !isSyncData()) {
-            callback.onOrderFinish();
+    public void executeTask() {
+        if (!isSyncData()) {
+            OrderTaskResponseEvent event = new OrderTaskResponseEvent();
+            event.setAction(MokoConstants.ACTION_ORDER_FINISH);
+            EventBus.getDefault().post(event);
             return;
         }
         if (mQueue.isEmpty()) {
@@ -416,15 +418,15 @@ public class MokoSupport implements MokoResponseCallback {
             if (characteristic.getUuid().toString().equals(OrderType.DISCONNECTED_NOTIFY.getUuid())) {
                 orderType = OrderType.DISCONNECTED_NOTIFY;
             }
-//            if (characteristic.getUuid().toString().equals(OrderType.STORE_DATA_NOTIFY.getUuid())) {
-//                orderType = OrderType.STORE_DATA_NOTIFY;
-//            }
             if (orderType != null) {
                 LogModule.i(orderType.getName());
-                Intent intent = new Intent(MokoConstants.ACTION_CURRENT_DATA);
-                intent.putExtra(MokoConstants.EXTRA_KEY_CURRENT_DATA_TYPE, orderType);
-                intent.putExtra(MokoConstants.EXTRA_KEY_RESPONSE_VALUE, value);
-                mContext.sendOrderedBroadcast(intent, null);
+                OrderTaskResponse response = new OrderTaskResponse();
+                response.orderType = orderType;
+                response.responseValue = value;
+                OrderTaskResponseEvent event = new OrderTaskResponseEvent();
+                event.setAction(MokoConstants.ACTION_CURRENT_DATA);
+                event.setResponse(response);
+                EventBus.getDefault().post(event);
             }
         } else {
             OrderTask orderTask = mQueue.peek();
@@ -451,29 +453,6 @@ public class MokoSupport implements MokoResponseCallback {
         if (!isSyncData()) {
             return;
         }
-//        OrderTask orderTask = mQueue.peek();
-//        if (value != null && value.length > 0
-//                && orderTask.response.responseType == OrderTask.RESPONSE_TYPE_WRITE) {
-//            String assembleValue = MokoUtils.bytesToHexString(orderTask.assemble());
-//            String valueStr = MokoUtils.bytesToHexString(value);
-//            if (!assembleValue.equals(valueStr))
-//                return;
-//            switch (orderTask.orderType) {
-//                case UUID:
-//                case MAJOR:
-//                case MINOR:
-//                case MEASURE_POWER:
-//                case TRANSMISSION:
-//                case ADV_INTERVAL:
-//                case DEVICE_NAME:
-//                case SCAN_MODE:
-//                case CONNECTION_MODE:
-//                case STORE_ALERT:
-//                case RESET:
-//                    formatCommonOrder(orderTask, value);
-//                    break;
-//            }
-//        }
     }
 
     @Override
@@ -490,17 +469,6 @@ public class MokoSupport implements MokoResponseCallback {
                 case HARDWARE_VERSION:
                 case SOFTWARE_VERSION:
                 case MANUFACTURER:
-//                case UUID:
-//                case MAJOR:
-//                case MINOR:
-//                case MEASURE_POWER:
-//                case TRANSMISSION:
-//                case ADV_INTERVAL:
-//                case DEVICE_NAME:
-//                case BATTERY:
-//                case SCAN_MODE:
-//                case CONNECTION_MODE:
-//                case STORE_ALERT:
                     formatCommonOrder(orderTask, value);
                     break;
             }
@@ -516,7 +484,7 @@ public class MokoSupport implements MokoResponseCallback {
         LogModule.i("device to app notify : " + orderTask.orderType.getName());
         orderTask.orderStatus = OrderTask.ORDER_STATUS_SUCCESS;
         mQueue.poll();
-        executeTask(orderTask.callback);
+        executeTask();
     }
 
     @Override
@@ -532,8 +500,11 @@ public class MokoSupport implements MokoResponseCallback {
         task.orderStatus = OrderTask.ORDER_STATUS_SUCCESS;
         task.response.responseValue = value;
         mQueue.poll();
-        task.callback.onOrderResult(task.response);
-        executeTask(task.callback);
+        OrderTaskResponseEvent event = new OrderTaskResponseEvent();
+        event.setAction(MokoConstants.ACTION_ORDER_RESULT);
+        event.setResponse(task.response);
+        EventBus.getDefault().post(event);
+        executeTask();
     }
 
     public void onOpenNotifyTimeout() {
@@ -554,14 +525,4 @@ public class MokoSupport implements MokoResponseCallback {
     public void timeoutHandler(OrderTask orderTask) {
         mHandler.postDelayed(orderTask.timeoutRunner, orderTask.delayTime);
     }
-
-    public String filterRawData;
-
-//    public void enableStoreDataNotify() {
-//        mokoBleManager.enableStoreDataNotify();
-//    }
-//
-//    public void disableStoreDataNotify() {
-//        mokoBleManager.disableStoreDataNotify();
-//    }
 }

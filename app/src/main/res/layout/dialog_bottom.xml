@@ -37,7 +37,7 @@
             android:textSize="15sp" />
     </RelativeLayout>
 
-    <com.moko.lorawan.view.WheelView
+    <com.moko.loratracker.view.WheelView
         android:id="@+id/wv_bottom"
         android:layout_width="0dp"
         android:layout_height="204dp"
@@ -54,7 +54,7 @@
         app:noEmpty="true"
         app:normalTextColor="@color/black_333333"
         app:normalTextSize="15sp"
-        app:selectedTextColor="@color/green_6caf10"
+        app:selectedTextColor="@color/blue_2f84d0"
         app:selectedTextSize="18sp"
         app:unitHeight="40dp" />
 

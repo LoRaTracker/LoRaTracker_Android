@@ -349,7 +349,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Reporting interval"
+                    android:text="Non-Alarm Reporting interval"
                     android:textColor="@color/black_333333"
                     android:textSize="15sp"
                     android:textStyle="bold" />

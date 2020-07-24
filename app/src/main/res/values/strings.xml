@@ -27,11 +27,11 @@
     <string name="permission_storage_need_title">Please turn on Storage permissions</string>
     <string name="permission_storage_need_content">LoRaTracker requires access to Location and Storage permission. If the permissions are not on, LoRaTracker cannot be used normally.</string>
     <string name="location_need_title">Turn on Location permission</string>
-    <string name="location_need_content">After that, LoRaTracker could search and connect with the iBeacon</string>
+    <string name="location_need_content">After that, LoRaTracker could search and connect with the Device</string>
     <string name="permission_location_close_title">Location persission is not available</string>
     <string name="permission_location_close_content">Please find it in cellphone setting- permission, and allow LoRaTracker use the Location and Storage permission</string>
     <string name="permission_location_need_title">Turn on Location permission</string>
-    <string name="permission_location_need_content">After that, LoRaTracker could search and connect with the iBeacon</string>
+    <string name="permission_location_need_content">After that, LoRaTracker could search and connect with the Device</string>
     <string name="title_advertiser">ADVERTISER</string>
     <string name="title_scanner">SCANNER</string>
     <string name="title_setting">SETTING</string>

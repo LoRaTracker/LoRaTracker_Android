@@ -23,11 +23,6 @@ public class MokoBleManager extends BleManager<BleManagerCallbacks> {
     private MokoResponseCallback mMokoResponseCallback;
     private static MokoBleManager managerInstance = null;
     private final static UUID SERVICE_UUID = UUID.fromString("0000FF00-0000-1000-8000-00805F9B34FB");
-//    private final static UUID STORE_DATA_UUID = UUID.fromString("0000FF0E-0000-1000-8000-00805F9B34FB");
-
-    private Handler handler;
-
-//    private BluetoothGattCharacteristic storeDataCharacteristic;
 
     public static synchronized MokoBleManager getMokoBleManager(final Context context) {
         if (managerInstance == null) {
@@ -58,8 +53,6 @@ public class MokoBleManager extends BleManager<BleManagerCallbacks> {
     public class MokoBleManagerGattCallback extends BleManagerGattCallback {
         @Override
         protected void initialize() {
-//            enableBatteryLevelNotifications();
-//            readBatteryLevel();
         }
 
         @Override
@@ -79,9 +72,6 @@ public class MokoBleManager extends BleManager<BleManagerCallbacks> {
 
         @Override
         protected void onCharacteristicNotified(final @NonNull BluetoothGatt gatt, final @NonNull BluetoothGattCharacteristic characteristic) {
-//            if (characteristic.getUuid().toString().equals(OrderType.STORE_DATA_NOTIFY.getUuid())) {
-//                return;
-//            }
             LogModule.e("onCharacteristicChanged");
             LogModule.e("device to app : " + MokoUtils.bytesToHexString(characteristic.getValue()));
             mMokoResponseCallback.onCharacteristicChanged(characteristic, characteristic.getValue());
@@ -107,27 +97,6 @@ public class MokoBleManager extends BleManager<BleManagerCallbacks> {
             mMokoResponseCallback.onDescriptorWrite();
         }
 
-//        @Override
-//        protected void onBatteryValueReceived(@NonNull BluetoothGatt gatt, int value) {
-//            LogModule.e(String.format("Battery:%d", value));
-//        }
     }
-
-//    public void enableStoreDataNotify() {
-//        setIndicationCallback(storeDataCharacteristic).with(new DataReceivedCallback() {
-//            @Override
-//            public void onDataReceived(@NonNull BluetoothDevice device, @NonNull Data data) {
-//                final byte[] value = data.getValue();
-//                LogModule.e("onDataReceived");
-//                LogModule.e("device to app : " + MokoUtils.bytesToHexString(value));
-//                mMokoResponseCallback.onCharacteristicChanged(storeDataCharacteristic, value);
-//            }
-//        });
-//        enableNotifications(storeDataCharacteristic).enqueue();
-//    }
-//
-//    public void disableStoreDataNotify() {
-//        disableNotifications(storeDataCharacteristic).enqueue();
-//    }
 
 }

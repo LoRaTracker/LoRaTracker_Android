@@ -13,8 +13,8 @@ import android.widget.TextView;
 import com.moko.loratracker.R;
 import com.moko.loratracker.activity.DeviceInfoActivity;
 import com.moko.loratracker.activity.FilterOptionsActivity;
-import com.moko.loratracker.service.MokoService;
 import com.moko.support.MokoSupport;
+import com.moko.support.OrderTaskAssembler;
 import com.moko.support.task.OrderTask;
 
 import java.util.ArrayList;
@@ -130,16 +130,16 @@ public class ScannerFragment extends Fragment implements SeekBar.OnSeekBarChange
         }
     }
 
-    public void saveParams(MokoService mokoService) {
+    public void saveParams() {
         final int scanIntervalProgress = sbScanInterval.getProgress();
         final int alarmNotify = npvAlarmNotify.getValue();
         final int alarmTriggerRssiProgress = sbAlarmTriggerRssi.getProgress();
         int rssi = alarmTriggerRssiProgress - 127;
         List<OrderTask> orderTasks = new ArrayList<>();
 
-        orderTasks.add(mokoService.setScanInterval(scanIntervalProgress));
-        orderTasks.add(mokoService.setAlarmNotify(alarmNotify));
-        orderTasks.add(mokoService.setAlarmTriggerRssi(rssi));
+        orderTasks.add(OrderTaskAssembler.setScanInterval(scanIntervalProgress));
+        orderTasks.add(OrderTaskAssembler.setAlarmNotify(alarmNotify));
+        orderTasks.add(OrderTaskAssembler.setAlarmTriggerRssi(rssi));
 
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }

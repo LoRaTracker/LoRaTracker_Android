@@ -2,7 +2,6 @@ package com.moko.loratracker.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
@@ -12,15 +11,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.moko.loratracker.R;
 import com.moko.loratracker.activity.DeviceInfoActivity;
 import com.moko.loratracker.entity.TxPowerEnum;
-import com.moko.loratracker.service.MokoService;
 import com.moko.support.MokoSupport;
+import com.moko.support.OrderTaskAssembler;
 import com.moko.support.task.OrderTask;
 
 import java.util.ArrayList;
@@ -29,7 +27,6 @@ import java.util.regex.Pattern;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class AdvFragment extends Fragment implements SeekBar.OnSeekBarChangeListener {
     private static final String TAG = AdvFragment.class.getSimpleName();
@@ -262,7 +259,7 @@ public class AdvFragment extends Fragment implements SeekBar.OnSeekBarChangeList
     }
 
 
-    public void saveParams(MokoService mokoService) {
+    public void saveParams() {
         final String advNameStr = etAdvName.getText().toString();
         final String uuidStr = etUuid.getText().toString();
         final String majorStr = etMajor.getText().toString();
@@ -270,27 +267,27 @@ public class AdvFragment extends Fragment implements SeekBar.OnSeekBarChangeList
         final String advIntervalStr = etAdvInterval.getText().toString();
         List<OrderTask> orderTasks = new ArrayList<>();
 
-        orderTasks.add(mokoService.setDeviceName(advNameStr));
+        orderTasks.add(OrderTaskAssembler.setDeviceName(advNameStr));
 
         String uuid = uuidStr.replaceAll("-", "");
-        orderTasks.add(mokoService.setUUID(uuid));
+        orderTasks.add(OrderTaskAssembler.setUUID(uuid));
 
         int major = Integer.parseInt(majorStr);
-        orderTasks.add(mokoService.setMajor(major));
+        orderTasks.add(OrderTaskAssembler.setMajor(major));
 
         int minor = Integer.parseInt(minorStr);
-        orderTasks.add(mokoService.setMinor(minor));
+        orderTasks.add(OrderTaskAssembler.setMinor(minor));
 
         int advInterval = Integer.parseInt(advIntervalStr);
-        orderTasks.add(mokoService.setAdvInterval(advInterval));
+        orderTasks.add(OrderTaskAssembler.setAdvInterval(advInterval));
 
         int rssi1mProgress = sbRssi1m.getProgress();
         int rssi1m = rssi1mProgress - 127;
-        orderTasks.add(mokoService.setMeasurePower(rssi1m));
+        orderTasks.add(OrderTaskAssembler.setMeasurePower(rssi1m));
 
         int txPowerProgress = sbTxPower.getProgress();
         int txPower = TxPowerEnum.fromOrdinal(txPowerProgress).getTxPower();
-        orderTasks.add(mokoService.setTransmission(txPower));
+        orderTasks.add(OrderTaskAssembler.setTransmission(txPower));
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 }

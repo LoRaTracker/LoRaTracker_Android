@@ -1,9 +1,14 @@
 package com.moko.support.task;
 
+import android.text.TextUtils;
+
+import com.moko.support.MokoConstants;
 import com.moko.support.MokoSupport;
-import com.moko.support.callback.MokoOrderTaskCallback;
 import com.moko.support.entity.OrderType;
+import com.moko.support.event.OrderTaskResponseEvent;
 import com.moko.support.utils.MokoUtils;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.Arrays;
 
@@ -11,8 +16,8 @@ public class GetFilterAdvRawData extends OrderTask {
     public byte[] data;
     private StringBuffer stringBuffer = new StringBuffer("");
 
-    public GetFilterAdvRawData(MokoOrderTaskCallback callback) {
-        super(OrderType.WRITE_CONFIG, callback, OrderTask.RESPONSE_TYPE_WRITE_NO_RESPONSE);
+    public GetFilterAdvRawData() {
+        super(OrderType.WRITE_CONFIG, OrderTask.RESPONSE_TYPE_WRITE_NO_RESPONSE);
     }
 
     @Override
@@ -38,11 +43,18 @@ public class GetFilterAdvRawData extends OrderTask {
             stringBuffer.append(data);
         }
         if (isEnd == 0) {
-            MokoSupport.getInstance().filterRawData = stringBuffer.toString();
-            response.responseValue = value;
+            String rawData = stringBuffer.toString();
+            if (!TextUtils.isEmpty(rawData)) {
+                byte[] rawDataByutes = MokoUtils.hex2bytes(stringBuffer.toString());
+                response.responseValue = rawDataByutes;
+            }
             orderStatus = OrderTask.ORDER_STATUS_SUCCESS;
             MokoSupport.getInstance().pollTask();
-            callback.onOrderResult(response);
+            OrderTaskResponseEvent event = new OrderTaskResponseEvent();
+            event.setAction(MokoConstants.ACTION_ORDER_RESULT);
+            event.setResponse(response);
+            EventBus.getDefault().post(event);
+            MokoSupport.getInstance().executeTask();
         }
     }
 }
