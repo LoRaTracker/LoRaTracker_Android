@@ -29,6 +29,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.moko.loratracker.AppConstants;
 import com.moko.loratracker.R;
 import com.moko.loratracker.dialog.AlertMessageDialog;
 import com.moko.loratracker.dialog.LoadingMessageDialog;
@@ -497,6 +498,14 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                     Toast.makeText(this, "file is not exists!", Toast.LENGTH_SHORT).show();
                 }
             }
+        } else if (requestCode == AppConstants.REQUEST_CODE_LORA_SETTING) {
+            ivSave.postDelayed(() -> {
+                showSyncingProgressDialog();
+                List<OrderTask> orderTasks = new ArrayList<>();
+                // setting
+                orderTasks.add(mMokoService.getLoRaConnectable());
+                MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+            }, 500);
         }
     }
 

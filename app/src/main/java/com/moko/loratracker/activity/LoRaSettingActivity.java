@@ -202,6 +202,7 @@ public class LoRaSettingActivity extends BaseActivity {
                 }
                 if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
                     if (mReadCHDR) {
+                        mReadCHDR = false;
                         return;
                     }
                     dismissSyncProgressDialog();

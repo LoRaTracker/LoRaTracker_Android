@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.moko.loratracker.AppConstants;
 import com.moko.loratracker.R;
 import com.moko.loratracker.activity.DeviceInfoActivity;
 import com.moko.loratracker.activity.LoRaSettingActivity;
@@ -109,7 +110,7 @@ public class SettingFragment extends Fragment {
             case R.id.tv_lora_setting:
                 // LORA
                 Intent intent = new Intent(getActivity(), LoRaSettingActivity.class);
-                startActivity(intent);
+                activity.startActivityForResult(intent, AppConstants.REQUEST_CODE_LORA_SETTING);
                 break;
             case R.id.tv_scan_window:
                 showBeaconScannerDialog();
