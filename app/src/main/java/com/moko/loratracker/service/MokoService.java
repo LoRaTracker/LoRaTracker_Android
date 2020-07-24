@@ -228,6 +228,13 @@ public class MokoService extends Service implements MokoOrderTaskCallback {
         return task;
     }
 
+
+    public OrderTask getLoRaConnectable() {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setData(ConfigKeyEnum.GET_LORA_CONNECTABLE);
+        return task;
+    }
+
     public OrderTask getScanWindow() {
         WriteConfigTask task = new WriteConfigTask(this);
         task.setData(ConfigKeyEnum.GET_SCAN_WINDOW);
@@ -252,12 +259,6 @@ public class MokoService extends Service implements MokoOrderTaskCallback {
         return task;
     }
 
-//    public OrderTask getFilterEnable() {
-//        WriteConfigTask task = new WriteConfigTask(this);
-//        task.setData(ConfigKeyEnum.GET_FILTER_ENABLE);
-//        return task;
-//    }
-
     public OrderTask getFilterMac() {
         WriteConfigTask task = new WriteConfigTask(this);
         task.setData(ConfigKeyEnum.GET_FILTER_MAC);
@@ -267,24 +268,6 @@ public class MokoService extends Service implements MokoOrderTaskCallback {
     public OrderTask getFilterName() {
         WriteConfigTask task = new WriteConfigTask(this);
         task.setData(ConfigKeyEnum.GET_FILTER_ADV_NAME);
-        return task;
-    }
-
-//    public OrderTask getFilterUUID() {
-//        WriteConfigTask task = new WriteConfigTask(this);
-//        task.setData(ConfigKeyEnum.GET_FILTER_UUID);
-//        return task;
-//    }
-
-    public OrderTask getFilterMajor() {
-        WriteConfigTask task = new WriteConfigTask(this);
-        task.setData(ConfigKeyEnum.GET_FILTER_MAJOR_RANGE);
-        return task;
-    }
-
-    public OrderTask getFilterMinor() {
-        WriteConfigTask task = new WriteConfigTask(this);
-        task.setData(ConfigKeyEnum.GET_FILTER_MINOR_RANGE);
         return task;
     }
 
@@ -304,6 +287,85 @@ public class MokoService extends Service implements MokoOrderTaskCallback {
         task.setData(ConfigKeyEnum.GET_FILTER_MINOR_RANGE);
         return task;
     }
+
+    public OrderTask getLoraMode() {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setData(ConfigKeyEnum.GET_LORA_MODE);
+        return task;
+    }
+
+    public OrderTask getLoraDevEUI() {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setData(ConfigKeyEnum.GET_LORA_DEV_EUI);
+        return task;
+    }
+
+    public OrderTask getLoraAppEUI() {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setData(ConfigKeyEnum.GET_LORA_APP_EUI);
+        return task;
+    }
+
+    public OrderTask getLoraAppKey() {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setData(ConfigKeyEnum.GET_LORA_APP_KEY);
+        return task;
+    }
+
+    public OrderTask getLoraDevAddr() {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setData(ConfigKeyEnum.GET_LORA_DEV_ADDR);
+        return task;
+    }
+
+    public OrderTask getLoraAppSKey() {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setData(ConfigKeyEnum.GET_LORA_APP_SKEY);
+        return task;
+    }
+
+    public OrderTask getLoraNwkSKey() {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setData(ConfigKeyEnum.GET_LORA_NWK_SKEY);
+        return task;
+    }
+
+    public OrderTask getLoraRegion() {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setData(ConfigKeyEnum.GET_LORA_REGION);
+        return task;
+    }
+
+    public OrderTask getLoraReportInterval() {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setData(ConfigKeyEnum.GET_LORA_REPORT_INTERVAL);
+        return task;
+    }
+
+    public OrderTask getLoraMessageType() {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setData(ConfigKeyEnum.GET_LORA_MESSAGE_TYPE);
+        return task;
+    }
+
+    public OrderTask getLoraCH() {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setData(ConfigKeyEnum.GET_LORA_CH);
+        return task;
+    }
+
+    public OrderTask getLoraDR() {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setData(ConfigKeyEnum.GET_LORA_DR);
+        return task;
+    }
+
+    public OrderTask getLoraADR() {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setData(ConfigKeyEnum.GET_LORA_ADR);
+        return task;
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////
     // WRITE
@@ -425,12 +487,6 @@ public class MokoService extends Service implements MokoOrderTaskCallback {
         return task;
     }
 
-//    public OrderTask setFilterEnable(int enable) {
-//        WriteConfigTask task = new WriteConfigTask(this);
-//        task.setFilterEnable(enable);
-//        return task;
-//    }
-
     public OrderTask setFilterMac(String mac) {
         WriteConfigTask task = new WriteConfigTask(this);
         task.setFilterMac(mac);
@@ -442,24 +498,6 @@ public class MokoService extends Service implements MokoOrderTaskCallback {
         task.setFilterName(name);
         return task;
     }
-
-//    public OrderTask setFilterUUID(String uuid) {
-//        WriteConfigTask task = new WriteConfigTask(this);
-//        task.setFilterUUID(uuid);
-//        return task;
-//    }
-
-//    public OrderTask setFilterMajor(String major) {
-//        WriteConfigTask task = new WriteConfigTask(this);
-//        task.setFilterMajor(major);
-//        return task;
-//    }
-//
-//    public OrderTask setFilterMinor(String minor) {
-//        WriteConfigTask task = new WriteConfigTask(this);
-//        task.setFilterMinor(minor);
-//        return task;
-//    }
 
     public OrderTask setFilterAdvRawData(ArrayList<String> filterRawDatas) {
         SetFilterAdvRawData task = new SetFilterAdvRawData(filterRawDatas, this);
@@ -475,6 +513,91 @@ public class MokoService extends Service implements MokoOrderTaskCallback {
     public OrderTask setFilterMinorRange(int enable, int majorMin, int majorMax) {
         WriteConfigTask task = new WriteConfigTask(this);
         task.setFilterMinorRange(enable, majorMin, majorMax);
+        return task;
+    }
+
+
+    public OrderTask setLoraDevAddr(String devAddr) {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setLoraDevAddr(devAddr);
+        return task;
+    }
+
+    public OrderTask setLoraNwkSKey(String nwkSKey) {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setLoraNwkSKey(nwkSKey);
+        return task;
+    }
+
+    public OrderTask setLoraAppSKey(String appSKey) {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setLoraAppSKey(appSKey);
+        return task;
+    }
+
+    public OrderTask setLoraAppEui(String appEui) {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setLoraAppEui(appEui);
+        return task;
+    }
+
+    public OrderTask setLoraDevEui(String devEui) {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setLoraDevEui(devEui);
+        return task;
+    }
+
+    public OrderTask setLoraAppKey(String appKey) {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setLoraAppKey(appKey);
+        return task;
+    }
+
+    public OrderTask setLoraUploadMode(int mode) {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setLoraUploadMode(mode);
+        return task;
+    }
+
+    public OrderTask setLoraUploadInterval(int interval) {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setLoraUploadInterval(interval);
+        return task;
+    }
+
+    public OrderTask setLoraMessageType(int type) {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setLoraMessageType(type);
+        return task;
+    }
+
+    public OrderTask setLoraRegion(int region) {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setLoraRegion(region);
+        return task;
+    }
+
+    public OrderTask setLoraCH(int ch1, int ch2) {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setLoraCH(ch1, ch2);
+        return task;
+    }
+
+    public OrderTask setLoraDR(int dr1, int dr2) {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setLoraDR(dr1, dr2);
+        return task;
+    }
+
+    public OrderTask setLoraADR(int adr) {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setLoraADR(adr);
+        return task;
+    }
+
+    public OrderTask setLoraConnect() {
+        WriteConfigTask task = new WriteConfigTask(this);
+        task.setLoraConnect();
         return task;
     }
 

@@ -393,6 +393,12 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                             scannerFragment.setAlarmTriggerRssi(rssi);
                                         }
                                         break;
+                                    case GET_LORA_CONNECTABLE:
+                                        if (length > 0) {
+                                            int connectable = value[3];
+                                            settingFragment.setLoRaConnectable(connectable);
+                                        }
+                                        break;
                                     case GET_SCAN_WINDOW:
                                         if (length > 0) {
                                             int scannerState = value[3] & 0xFF;
@@ -610,6 +616,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>();
         // setting
+        orderTasks.add(mMokoService.getLoRaConnectable());
         orderTasks.add(mMokoService.getScanWindow());
         orderTasks.add(mMokoService.getConnectable());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));

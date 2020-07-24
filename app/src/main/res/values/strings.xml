@@ -17,7 +17,7 @@
     <string name="company_name">MOKO TECHNOLOGY LTD.</string>
     <string name="about_title">ABOUT</string>
     <string name="company_website">www.mokosmart.com</string>
-    <string name="storage_interval">*The device will store the BLE ADV data every %ds and the same MAC addree only be saved one time.</string>
+    <string name="storage_interval">*The device will store the Non-Alarm BLE ADV data every %ds and the same MAC addree only be saved one time.</string>
     <string name="alarm_trigger_rssi">*The device alarm  is triggered when the BLE RSSI scanned is greater than %ddbm.</string>
     <string name="rssi_filter">*The Beacon will store valid ADV data with RSSI no less than %ddBm.</string>
 
@@ -44,5 +44,33 @@
         <item>Light</item>
         <item>Vibration</item>
         <item>Light+Vibration</item>
+    </string-array>
+    <string-array name="lora_connectable">
+        <item>Disconnected</item>
+        <item>Connected</item>
+        <item>Connecting</item>
+    </string-array>
+    <string-array name="region">
+        <item>EU868</item>
+        <item>US915</item>
+        <item>US915HYBRID</item>
+        <item>CN779</item>
+        <item>EU433</item>
+        <item>AU915</item>
+        <item>AU915OLD</item>
+        <item>CN470</item>
+        <item>AS923</item>
+        <item>KR920</item>
+        <item>IN865</item>
+        <item>CN470PREQUEL</item>
+        <item>STE920</item>
+    </string-array>
+    <string-array name="upload_mode">
+        <item>ABP</item>
+        <item>OTAA</item>
+    </string-array>
+    <string-array name="message_type">
+        <item>Unconfirmed</item>
+        <item>Confirmed</item>
     </string-array>
 </resources>

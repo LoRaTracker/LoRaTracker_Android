@@ -1,6 +1,7 @@
 package com.moko.loratracker.fragment;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 
 import com.moko.loratracker.R;
 import com.moko.loratracker.activity.DeviceInfoActivity;
+import com.moko.loratracker.activity.LoRaSettingActivity;
 import com.moko.loratracker.dialog.AlertMessageDialog;
 import com.moko.loratracker.dialog.ChangePasswordDialog;
 import com.moko.loratracker.dialog.ResetDialog;
@@ -39,8 +41,9 @@ public class SettingFragment extends Fragment {
     ImageView ivConnectable;
     @Bind(R.id.iv_power_off)
     ImageView ivPowerOff;
-
-
+    @Bind(R.id.tv_lora_connectable)
+    TextView tvLoRaConnectable;
+    private String[] loraConnectable;
     private DeviceInfoActivity activity;
 
     public SettingFragment() {
@@ -65,6 +68,7 @@ public class SettingFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_setting, container, false);
         ButterKnife.bind(this, view);
         activity = (DeviceInfoActivity) getActivity();
+        loraConnectable = getResources().getStringArray(R.array.lora_connectable);
         return view;
     }
 
@@ -103,7 +107,9 @@ public class SettingFragment extends Fragment {
                 activity.chooseFirmwareFile();
                 break;
             case R.id.tv_lora_setting:
-                // TODO: 2020/7/21 LORA
+                // LORA
+                Intent intent = new Intent(getActivity(), LoRaSettingActivity.class);
+                startActivity(intent);
                 break;
             case R.id.tv_scan_window:
                 showBeaconScannerDialog();
@@ -238,5 +244,9 @@ public class SettingFragment extends Fragment {
     public void setConnectable(int connectable) {
         connectState = connectable == 1;
         ivConnectable.setImageResource(connectable == 1 ? R.drawable.ic_checked : R.drawable.ic_unchecked);
+    }
+
+    public void setLoRaConnectable(int connectable) {
+        tvLoRaConnectable.setText(loraConnectable[connectable]);
     }
 }

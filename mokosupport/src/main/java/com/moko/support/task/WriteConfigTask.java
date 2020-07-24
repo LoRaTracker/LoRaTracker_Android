@@ -40,6 +40,7 @@ public class WriteConfigTask extends OrderTask {
             case GET_SCAN_INTERVAL:
             case GET_ALARM_NOTIFY:
             case GET_ALARM_RSSI:
+            case GET_LORA_CONNECTABLE:
             case GET_SCAN_WINDOW:
             case GET_CONNECTABLE:
             case GET_BATTERY:
@@ -300,5 +301,143 @@ public class WriteConfigTask extends OrderTask {
         data[2] = (byte) 0x02;
         data[3] = (byte) scannerState;
         data[4] = (byte) startTime;
+    }
+
+    public void setLoraDevAddr(String devAddr) {
+        byte[] rawDataBytes = MokoUtils.hex2bytes(devAddr);
+        int length = rawDataBytes.length;
+        data = new byte[3 + length];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.SET_LORA_DEV_ADDR.getConfigKey();
+        data[2] = (byte) length;
+        for (int i = 0; i < length; i++) {
+            data[i + 3] = rawDataBytes[i];
+        }
+    }
+
+    public void setLoraAppSKey(String appSkey) {
+        byte[] rawDataBytes = MokoUtils.hex2bytes(appSkey);
+        int length = rawDataBytes.length;
+        data = new byte[3 + length];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.SET_LORA_APP_SKEY.getConfigKey();
+        data[2] = (byte) length;
+        for (int i = 0; i < rawDataBytes.length; i++) {
+            data[i + 3] = rawDataBytes[i];
+        }
+    }
+
+    public void setLoraNwkSKey(String nwkSkey) {
+        byte[] rawDataBytes = MokoUtils.hex2bytes(nwkSkey);
+        int length = rawDataBytes.length;
+        data = new byte[3 + length];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.SET_LORA_NWK_SKEY.getConfigKey();
+        data[2] = (byte) length;
+        for (int i = 0; i < rawDataBytes.length; i++) {
+            data[i + 3] = rawDataBytes[i];
+        }
+    }
+
+    public void setLoraDevEui(String devEui) {
+        byte[] rawDataBytes = MokoUtils.hex2bytes(devEui);
+        int length = rawDataBytes.length;
+        data = new byte[3 + length];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.SET_LORA_DEV_EUI.getConfigKey();
+        data[2] = (byte) length;
+        for (int i = 0; i < rawDataBytes.length; i++) {
+            data[i + 3] = rawDataBytes[i];
+        }
+    }
+
+    public void setLoraAppEui(String appEui) {
+        byte[] rawDataBytes = MokoUtils.hex2bytes(appEui);
+        int length = rawDataBytes.length;
+        data = new byte[3 + length];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.SET_LORA_APP_EUI.getConfigKey();
+        data[2] = (byte) length;
+        for (int i = 0; i < rawDataBytes.length; i++) {
+            data[i + 3] = rawDataBytes[i];
+        }
+    }
+
+    public void setLoraAppKey(String appKey) {
+        byte[] rawDataBytes = MokoUtils.hex2bytes(appKey);
+        int length = rawDataBytes.length;
+        data = new byte[3 + length];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.SET_LORA_APP_KEY.getConfigKey();
+        data[2] = (byte) length;
+        for (int i = 0; i < rawDataBytes.length; i++) {
+            data[i + 3] = rawDataBytes[i];
+        }
+    }
+
+    public void setLoraUploadMode(int mode) {
+        data = new byte[4];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.SET_LORA_MODE.getConfigKey();
+        data[2] = (byte) 0x01;
+        data[3] = (byte) mode;
+    }
+
+    public void setLoraUploadInterval(int interval) {
+        data = new byte[4];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.SET_LORA_REPORT_INTERVAL.getConfigKey();
+        data[2] = (byte) 0x01;
+        data[3] = (byte) interval;
+    }
+
+    public void setLoraMessageType(int type) {
+        data = new byte[4];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.SET_LORA_MESSAGE_TYPE.getConfigKey();
+        data[2] = (byte) 0x01;
+        data[3] = (byte) type;
+    }
+
+    public void setLoraRegion(int region) {
+        data = new byte[4];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.SET_LORA_REGION.getConfigKey();
+        data[2] = (byte) 0x01;
+        data[3] = (byte) region;
+    }
+
+    public void setLoraCH(int ch1, int ch2) {
+        data = new byte[5];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.SET_LORA_CH.getConfigKey();
+        data[2] = (byte) 0x02;
+        data[3] = (byte) ch1;
+        data[4] = (byte) ch2;
+    }
+
+    public void setLoraDR(int dr1, int dr2) {
+        data = new byte[5];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.SET_LORA_DR.getConfigKey();
+        data[2] = (byte) 0x02;
+        data[3] = (byte) dr1;
+        data[4] = (byte) dr2;
+    }
+
+    public void setLoraADR(int adr) {
+        data = new byte[4];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.SET_LORA_ADR.getConfigKey();
+        data[2] = (byte) 0x01;
+        data[3] = (byte) adr;
+    }
+
+    public void setLoraConnect() {
+        data = new byte[4];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.SET_LORA_CONNECT.getConfigKey();
+        data[2] = (byte) 0x01;
+        data[3] = (byte) 0x01;
     }
 }
