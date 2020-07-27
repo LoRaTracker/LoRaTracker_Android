@@ -70,10 +70,6 @@ public class MokoCharacteristicHandler {
                         mokoCharacteristicMap.put(OrderType.DEVICE_MODEL, new MokoCharacteristic(characteristic, OrderType.DEVICE_MODEL));
                         continue;
                     }
-                    if (characteristicUuid.equals(OrderType.PRODUCT_DATE.getUuid())) {
-                        mokoCharacteristicMap.put(OrderType.PRODUCT_DATE, new MokoCharacteristic(characteristic, OrderType.PRODUCT_DATE));
-                        continue;
-                    }
                     if (characteristicUuid.equals(OrderType.HARDWARE_VERSION.getUuid())) {
                         mokoCharacteristicMap.put(OrderType.HARDWARE_VERSION, new MokoCharacteristic(characteristic, OrderType.HARDWARE_VERSION));
                         continue;

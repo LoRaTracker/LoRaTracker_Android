@@ -432,7 +432,6 @@ public class MokoSupport implements MokoResponseCallback {
             OrderTask orderTask = mQueue.peek();
             if (value != null && value.length > 0 && orderTask != null) {
                 if (orderTask.orderType == OrderType.WRITE_CONFIG
-                        && 0xED == (value[0] & 0xFF)
                         && 0x25 == (value[1] & 0xFF)) {
                     orderTask.parseValue(value);
                     return;
@@ -464,7 +463,6 @@ public class MokoSupport implements MokoResponseCallback {
         if (value != null && value.length > 0 && orderTask.response.responseType == OrderTask.RESPONSE_TYPE_READ) {
             switch (orderTask.orderType) {
                 case DEVICE_MODEL:
-                case PRODUCT_DATE:
                 case FIRMWARE_VERSION:
                 case HARDWARE_VERSION:
                 case SOFTWARE_VERSION:
@@ -473,18 +471,6 @@ public class MokoSupport implements MokoResponseCallback {
                     break;
             }
         }
-    }
-
-    @Override
-    public void onDescriptorWrite() {
-        if (!isSyncData()) {
-            return;
-        }
-        OrderTask orderTask = mQueue.peek();
-        LogModule.i("device to app notify : " + orderTask.orderType.getName());
-        orderTask.orderStatus = OrderTask.ORDER_STATUS_SUCCESS;
-        mQueue.poll();
-        executeTask();
     }
 
     @Override

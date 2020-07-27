@@ -1,15 +1,12 @@
 package com.moko.support;
 
 import com.moko.support.entity.ConfigKeyEnum;
-import com.moko.support.entity.OrderType;
 import com.moko.support.task.GetDeviceModelTask;
 import com.moko.support.task.GetFilterAdvRawData;
 import com.moko.support.task.GetFirmwareVersionTask;
 import com.moko.support.task.GetHardwareVersionTask;
 import com.moko.support.task.GetManufacturerTask;
-import com.moko.support.task.GetProductDateTask;
 import com.moko.support.task.GetSoftwareVersionTask;
-import com.moko.support.task.OpenNotifyTask;
 import com.moko.support.task.OrderTask;
 import com.moko.support.task.SetFilterAdvRawData;
 import com.moko.support.task.SetPasswordTask;
@@ -32,11 +29,6 @@ public class OrderTaskAssembler {
         return getDeviceModelTask;
     }
 
-    public static  OrderTask getProductDate() {
-        GetProductDateTask getProductDateTask = new GetProductDateTask();
-        return getProductDateTask;
-    }
-
     public static  OrderTask getHardwareVersion() {
         GetHardwareVersionTask getHardwareVersionTask = new GetHardwareVersionTask();
         return getHardwareVersionTask;
@@ -54,110 +46,110 @@ public class OrderTaskAssembler {
 
     public static  OrderTask getBattery() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_BATTERY);
+        task.setData(ConfigKeyEnum.KEY_BATTERY);
         return task;
     }
 
     public static  OrderTask getiBeaconUUID() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_IBEACON_UUID);
+        task.setData(ConfigKeyEnum.KEY_IBEACON_UUID);
         return task;
     }
 
     public static  OrderTask getiBeaconMajor() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_IBEACON_MAJOR);
+        task.setData(ConfigKeyEnum.KEY_IBEACON_MAJOR);
         return task;
     }
 
     public static  OrderTask getIBeaconMinor() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_IBEACON_MINOR);
+        task.setData(ConfigKeyEnum.KEY_IBEACON_MINOR);
         return task;
     }
 
     public static  OrderTask getMeasurePower() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_MEASURE_POWER);
+        task.setData(ConfigKeyEnum.KEY_MEASURE_POWER);
         return task;
     }
 
     public static  OrderTask getTransmission() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_TRANSMISSION);
+        task.setData(ConfigKeyEnum.KEY_TRANSMISSION);
         return task;
     }
 
     public static  OrderTask getAdvInterval() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_ADV_INTERVAL);
+        task.setData(ConfigKeyEnum.KEY_ADV_INTERVAL);
         return task;
     }
 
     public static  OrderTask getAdvName() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_ADV_NAME);
+        task.setData(ConfigKeyEnum.KEY_ADV_NAME);
         return task;
     }
 
     public static  OrderTask getScanInterval() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_SCAN_INTERVAL);
+        task.setData(ConfigKeyEnum.KEY_SCAN_INTERVAL);
         return task;
     }
 
     public static  OrderTask getAlarmNotify() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_ALARM_NOTIFY);
+        task.setData(ConfigKeyEnum.KEY_ALARM_NOTIFY);
         return task;
     }
 
     public static  OrderTask getAlarmRssi() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_ALARM_RSSI);
+        task.setData(ConfigKeyEnum.KEY_ALARM_RSSI);
         return task;
     }
 
 
     public static  OrderTask getLoRaConnectable() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_LORA_CONNECTABLE);
+        task.setData(ConfigKeyEnum.KEY_LORA_CONNECTABLE);
         return task;
     }
 
     public static  OrderTask getScanWindow() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_SCAN_WINDOW);
+        task.setData(ConfigKeyEnum.KEY_SCAN_WINDOW);
         return task;
     }
 
     public static  OrderTask getConnectable() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_CONNECTABLE);
+        task.setData(ConfigKeyEnum.KEY_CONNECTABLE);
         return task;
     }
 
     public static  OrderTask getMacAddress() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_DEVICE_MAC);
+        task.setData(ConfigKeyEnum.KEY_DEVICE_MAC);
         return task;
     }
 
     public static  OrderTask getFilterRssi() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_FILTER_RSSI);
+        task.setData(ConfigKeyEnum.KEY_FILTER_RSSI);
         return task;
     }
 
     public static  OrderTask getFilterMac() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_FILTER_MAC);
+        task.setData(ConfigKeyEnum.KEY_FILTER_MAC);
         return task;
     }
 
     public static  OrderTask getFilterName() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_FILTER_ADV_NAME);
+        task.setData(ConfigKeyEnum.KEY_FILTER_ADV_NAME);
         return task;
     }
 
@@ -168,91 +160,91 @@ public class OrderTaskAssembler {
 
     public static  OrderTask getFilterMajorRange() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_FILTER_MAJOR_RANGE);
+        task.setData(ConfigKeyEnum.KEY_FILTER_MAJOR_RANGE);
         return task;
     }
 
     public static  OrderTask getFilterMinorRange() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_FILTER_MINOR_RANGE);
+        task.setData(ConfigKeyEnum.KEY_FILTER_MINOR_RANGE);
         return task;
     }
 
     public static  OrderTask getLoraMode() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_LORA_MODE);
+        task.setData(ConfigKeyEnum.KEY_LORA_MODE);
         return task;
     }
 
     public static  OrderTask getLoraDevEUI() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_LORA_DEV_EUI);
+        task.setData(ConfigKeyEnum.KEY_LORA_DEV_EUI);
         return task;
     }
 
     public static  OrderTask getLoraAppEUI() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_LORA_APP_EUI);
+        task.setData(ConfigKeyEnum.KEY_LORA_APP_EUI);
         return task;
     }
 
     public static  OrderTask getLoraAppKey() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_LORA_APP_KEY);
+        task.setData(ConfigKeyEnum.KEY_LORA_APP_KEY);
         return task;
     }
 
     public static  OrderTask getLoraDevAddr() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_LORA_DEV_ADDR);
+        task.setData(ConfigKeyEnum.KEY_LORA_DEV_ADDR);
         return task;
     }
 
     public static  OrderTask getLoraAppSKey() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_LORA_APP_SKEY);
+        task.setData(ConfigKeyEnum.KEY_LORA_APP_SKEY);
         return task;
     }
 
     public static  OrderTask getLoraNwkSKey() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_LORA_NWK_SKEY);
+        task.setData(ConfigKeyEnum.KEY_LORA_NWK_SKEY);
         return task;
     }
 
     public static  OrderTask getLoraRegion() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_LORA_REGION);
+        task.setData(ConfigKeyEnum.KEY_LORA_REGION);
         return task;
     }
 
     public static  OrderTask getLoraReportInterval() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_LORA_REPORT_INTERVAL);
+        task.setData(ConfigKeyEnum.KEY_LORA_REPORT_INTERVAL);
         return task;
     }
 
     public static  OrderTask getLoraMessageType() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_LORA_MESSAGE_TYPE);
+        task.setData(ConfigKeyEnum.KEY_LORA_MESSAGE_TYPE);
         return task;
     }
 
     public static  OrderTask getLoraCH() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_LORA_CH);
+        task.setData(ConfigKeyEnum.KEY_LORA_CH);
         return task;
     }
 
     public static  OrderTask getLoraDR() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_LORA_DR);
+        task.setData(ConfigKeyEnum.KEY_LORA_DR);
         return task;
     }
 
     public static  OrderTask getLoraADR() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.GET_LORA_ADR);
+        task.setData(ConfigKeyEnum.KEY_LORA_ADR);
         return task;
     }
 
@@ -366,7 +358,7 @@ public class OrderTaskAssembler {
 
     public static  OrderTask closePower() {
         WriteConfigTask task = new WriteConfigTask();
-        task.setData(ConfigKeyEnum.SET_CLOSE);
+        task.setClosePower();
         return task;
     }
 
@@ -487,24 +479,6 @@ public class OrderTaskAssembler {
     public static  OrderTask setLoraConnect() {
         WriteConfigTask task = new WriteConfigTask();
         task.setLoraConnect();
-        return task;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // NOTIFY
-    ///////////////////////////////////////////////////////////////////////////
-    public static  OrderTask openWriteConfigNotify() {
-        OpenNotifyTask task = new OpenNotifyTask(OrderType.WRITE_CONFIG);
-        return task;
-    }
-
-    public static  OrderTask openDisconnectedNotify() {
-        OpenNotifyTask task = new OpenNotifyTask(OrderType.DISCONNECTED_NOTIFY);
-        return task;
-    }
-
-    public static  OrderTask openPasswordNotify() {
-        OpenNotifyTask task = new OpenNotifyTask(OrderType.PASSWORD);
         return task;
     }
 }

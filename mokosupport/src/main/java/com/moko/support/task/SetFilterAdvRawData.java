@@ -45,6 +45,9 @@ public class SetFilterAdvRawData extends OrderTask {
         data[2] = (byte) (length + 2);
         data[3] = (byte) (index > 0 ? 0x00 : 0x01);
         data[4] = (byte) (size - (index + 1));
+        for (int i = 0; i < length; i++) {
+            data[5 + i] = rawDataBytes[i];
+        }
         return data;
     }
 

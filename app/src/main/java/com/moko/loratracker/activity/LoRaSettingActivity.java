@@ -177,11 +177,6 @@ public class LoRaSettingActivity extends BaseActivity {
                     return;
                 }
                 dismissSyncProgressDialog();
-                if (!mIsFailed) {
-                    ToastUtils.showToast(LoRaSettingActivity.this, "Success");
-                } else {
-                    ToastUtils.showToast(LoRaSettingActivity.this, "Error");
-                }
             }
             if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
                 OrderTaskResponse response = event.getResponse();
@@ -192,15 +187,19 @@ public class LoRaSettingActivity extends BaseActivity {
                 switch (orderType) {
                     case WRITE_CONFIG:
                         if (value.length >= 2) {
+                            int header = value[0] & 0xFF;
                             int key = value[1] & 0xFF;
                             ConfigKeyEnum configKeyEnum = ConfigKeyEnum.fromConfigKey(key);
                             if (configKeyEnum == null) {
                                 return;
                             }
+                            if (header == 0xEF && configKeyEnum == ConfigKeyEnum.KEY_DEVICE_MAC) {
+                                configKeyEnum = ConfigKeyEnum.KEY_LORA_CONNECT;
+                            }
                             int length = value[2] & 0xFF;
                             switch (configKeyEnum) {
-                                case GET_LORA_MODE:
-                                    if (length > 0) {
+                                case KEY_LORA_MODE:
+                                    if (header == 0xED && length > 0) {
                                         final int mode = value[3];
                                         tvUploadMode.setText(mUploadMode[mode - 1]);
                                         mSelectedMode = mode - 1;
@@ -212,75 +211,114 @@ public class LoRaSettingActivity extends BaseActivity {
                                             llModemOtaa.setVisibility(View.VISIBLE);
                                         }
                                     }
+                                    if (header == 0xEF && (value[3] & 0xff) != 1) {
+                                        mIsFailed = true;
+                                    }
                                     break;
-                                case GET_LORA_DEV_EUI:
-                                    if (length > 0) {
+                                case KEY_LORA_DEV_EUI:
+                                    if (header == 0xED && length > 0) {
                                         byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
                                         etDevEui.setText(MokoUtils.bytesToHexString(rawDataBytes));
                                     }
+                                    if (header == 0xEF && (value[3] & 0xff) != 1) {
+                                        mIsFailed = true;
+                                    }
                                     break;
-                                case GET_LORA_APP_EUI:
-                                    if (length > 0) {
+                                case KEY_LORA_APP_EUI:
+                                    if (header == 0xED && length > 0) {
                                         byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
                                         etAppEui.setText(MokoUtils.bytesToHexString(rawDataBytes));
                                     }
+                                    if (header == 0xEF && (value[3] & 0xff) != 1) {
+                                        mIsFailed = true;
+                                    }
                                     break;
-                                case GET_LORA_APP_KEY:
-                                    if (length > 0) {
+                                case KEY_LORA_APP_KEY:
+                                    if (header == 0xED && length > 0) {
                                         byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
                                         etAppKey.setText(MokoUtils.bytesToHexString(rawDataBytes));
                                     }
+                                    if (header == 0xEF && (value[3] & 0xff) != 1) {
+                                        mIsFailed = true;
+                                    }
                                     break;
-                                case GET_LORA_DEV_ADDR:
-                                    if (length > 0) {
+                                case KEY_LORA_DEV_ADDR:
+                                    if (header == 0xED && length > 0) {
                                         byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
                                         etDevAddr.setText(MokoUtils.bytesToHexString(rawDataBytes));
                                     }
+                                    if (header == 0xEF && (value[3] & 0xff) != 1) {
+                                        mIsFailed = true;
+                                    }
                                     break;
-                                case GET_LORA_APP_SKEY:
-                                    if (length > 0) {
+                                case KEY_LORA_APP_SKEY:
+                                    if (header == 0xED && length > 0) {
                                         byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
                                         etAppSkey.setText(MokoUtils.bytesToHexString(rawDataBytes));
                                     }
+                                    if (header == 0xEF && (value[3] & 0xff) != 1) {
+                                        mIsFailed = true;
+                                    }
                                     break;
-                                case GET_LORA_NWK_SKEY:
-                                    if (length > 0) {
+                                case KEY_LORA_NWK_SKEY:
+                                    if (header == 0xED && length > 0) {
                                         byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
                                         etNwkSkey.setText(MokoUtils.bytesToHexString(rawDataBytes));
                                     }
                                     break;
-                                case GET_LORA_REGION:
-                                    if (length > 0) {
+                                case KEY_LORA_REGION:
+                                    if (header == 0xED && length > 0) {
                                         final int region = value[3] & 0xFF;
                                         mSelectedRegion = region;
                                         tvRegion.setText(mRegions[region]);
                                     }
+                                    if (header == 0xEF) {
+                                        if ((value[3] & 0xff) != 1) {
+                                            mIsFailed = true;
+                                        } else {
+                                            if (mReadCHDR) {
+                                                List<OrderTask> orderTasks = new ArrayList<>();
+                                                orderTasks.add(OrderTaskAssembler.getLoraCH());
+                                                orderTasks.add(OrderTaskAssembler.getLoraDR());
+                                                MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
+                                            }
+                                        }
+                                    }
                                     break;
-                                case GET_LORA_MESSAGE_TYPE:
-                                    if (length > 0) {
+                                case KEY_LORA_MESSAGE_TYPE:
+                                    if (header == 0xED && length > 0) {
                                         final int messageType = value[3] & 0xFF;
                                         mSelectedMessageType = messageType;
                                         tvMessageType.setText(mMessageType[messageType]);
                                     }
+                                    if (header == 0xEF && (value[3] & 0xff) != 1) {
+                                        mIsFailed = true;
+                                    }
                                     break;
-                                case GET_LORA_REPORT_INTERVAL:
-                                    if (length > 0) {
+                                case KEY_LORA_REPORT_INTERVAL:
+                                    if (header == 0xED && length > 0) {
                                         final int reportInterval = value[3] & 0xFF;
                                         etReportInterval.setText(String.valueOf(reportInterval));
                                     }
+                                    if (header == 0xEF && (value[3] & 0xff) != 1) {
+                                        mIsFailed = true;
+                                    }
                                     break;
-                                case GET_LORA_CH:
-                                    if (length > 1) {
+                                case KEY_LORA_CH:
+                                    if (header == 0xED && length > 1) {
                                         final int ch1 = value[3] & 0xFF;
                                         final int ch2 = value[4] & 0xFF;
                                         mSelectedCh1 = ch1;
                                         mSelectedCh2 = ch2;
                                         tvCh1.setText(String.valueOf(ch1));
-                                        tvCh1.setText(String.valueOf(ch2));
+                                        tvCh2.setText(String.valueOf(ch2));
+                                    }
+                                    if (header == 0xEF && (value[3] & 0xff) != 1) {
+                                        mIsFailed = true;
                                     }
                                     break;
-                                case GET_LORA_DR:
-                                    if (length > 1) {
+                                case KEY_LORA_DR:
+                                    if (header == 0xED && length > 1) {
                                         final int dr1 = value[3] & 0xFF;
                                         final int dr2 = value[4] & 0xFF;
                                         mSelectedDr1 = dr1;
@@ -288,40 +326,27 @@ public class LoRaSettingActivity extends BaseActivity {
                                         tvDr1.setText(String.format("DR%d", dr1));
                                         tvDr2.setText(String.format("DR%d", dr2));
                                     }
+                                    if (header == 0xEF && (value[3] & 0xff) != 1) {
+                                        mIsFailed = true;
+                                    }
                                     break;
-                                case GET_LORA_ADR:
-                                    if (length > 0) {
+                                case KEY_LORA_ADR:
+                                    if (header == 0xED && length > 0) {
                                         final int adr = value[3] & 0xFF;
                                         cbAdr.setChecked(adr == 1);
                                     }
-                                    break;
-                                case SET_LORA_DEV_ADDR:
-                                case SET_LORA_NWK_SKEY:
-                                case SET_LORA_APP_SKEY:
-                                case SET_LORA_DEV_EUI:
-                                case SET_LORA_APP_EUI:
-                                case SET_LORA_APP_KEY:
-                                case SET_LORA_MESSAGE_TYPE:
-                                case SET_LORA_MODE:
-                                case SET_LORA_REPORT_INTERVAL:
-                                case SET_LORA_CH:
-                                case SET_LORA_DR:
-                                case SET_LORA_ADR:
-                                case SET_LORA_CONNECT:
-                                    if ((value[3] & 0xff) != 1) {
+                                    if (header == 0xEF && (value[3] & 0xff) != 1) {
                                         mIsFailed = true;
                                     }
                                     break;
-                                case SET_LORA_REGION:
-                                    if ((value[3] & 0xff) != 1) {
+                                case KEY_LORA_CONNECT:
+                                    if (header == 0xEF && (value[3] & 0xff) != 1) {
                                         mIsFailed = true;
+                                    }
+                                    if (!mIsFailed) {
+                                        ToastUtils.showToast(LoRaSettingActivity.this, "Success");
                                     } else {
-                                        if (mReadCHDR) {
-                                            List<OrderTask> orderTasks = new ArrayList<>();
-                                            orderTasks.add(OrderTaskAssembler.getLoraCH());
-                                            orderTasks.add(OrderTaskAssembler.getLoraDR());
-                                            MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-                                        }
+                                        ToastUtils.showToast(LoRaSettingActivity.this, "Error");
                                     }
                                     break;
                             }

@@ -35,7 +35,7 @@ public class GetFilterAdvRawData extends OrderTask {
             return;
         if (0x25 != (value[1] & 0xFF))
             return;
-        int dataLength = value[2] & 0xFF - 2;
+        int dataLength = (value[2] & 0xFF) - 2;
         int isStart = value[3] & 0xFF;
         int isEnd = value[4] & 0xFF;
         if (dataLength > 0) {
@@ -45,8 +45,16 @@ public class GetFilterAdvRawData extends OrderTask {
         if (isEnd == 0) {
             String rawData = stringBuffer.toString();
             if (!TextUtils.isEmpty(rawData)) {
-                byte[] rawDataByutes = MokoUtils.hex2bytes(stringBuffer.toString());
-                response.responseValue = rawDataByutes;
+                byte[] rawDataBytes = MokoUtils.hex2bytes(stringBuffer.toString());
+                int rawDataLength = rawDataBytes.length;
+                byte[] responseValue = new byte[rawDataLength + 3];
+                responseValue[0] = (byte) 0xED;
+                responseValue[1] = (byte) 0x25;
+                responseValue[2] = (byte) rawDataLength;
+                for (int i = 0; i < rawDataLength; i++) {
+                    responseValue[i + 3] = rawDataBytes[i];
+                }
+                response.responseValue = responseValue;
             }
             orderStatus = OrderTask.ORDER_STATUS_SUCCESS;
             MokoSupport.getInstance().pollTask();

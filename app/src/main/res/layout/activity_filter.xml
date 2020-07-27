@@ -118,34 +118,10 @@
             <View
                 style="@style/divider_line"
                 android:layout_width="0dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="20dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_rssi_filter_tips" />
-
-
-            <TextView
-                android:id="@+id/adv_data_filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:text="ADV Data Filter"
-                android:textColor="@color/black_333333"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_rssi_filter_tips" />
-
-            <TextView
-                android:id="@+id/tv_adv_data_filter_tips"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="*Turn off this option, the Beacon will store all types of BLE ADV data.Turn on this option, the Beacon will store the corresponding ADV data according to the filtering rules."
-                android:textColor="@color/black_333333"
-                android:textSize="12sp"
-                android:layout_marginTop="10dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/adv_data_filter" />
 
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/cl_adv_data_filter"
@@ -155,15 +131,7 @@
                 android:visibility="visible"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_adv_data_filter_tips">
-
-                <View
-                    style="@style/divider_line"
-                    android:layout_width="0dp"
-                    android:layout_marginTop="10dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/tv_rssi_filter_tips">
 
                 <TextView
                     android:id="@+id/mac_address"
@@ -250,7 +218,6 @@
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/iv_adv_name" />
 
-
                 <View
                     style="@style/divider_line"
                     android:layout_width="0dp"
@@ -269,7 +236,7 @@
                     android:textSize="15sp"
                     android:textStyle="bold"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/iv_adv_name" />
+                    app:layout_constraintTop_toBottomOf="@id/et_adv_name" />
 
                 <ImageView
                     android:id="@+id/iv_ibeacon_major"

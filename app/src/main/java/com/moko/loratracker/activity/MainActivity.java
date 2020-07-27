@@ -33,6 +33,7 @@ import com.moko.loratracker.entity.BeaconInfo;
 import com.moko.loratracker.utils.BeaconInfoParseableImpl;
 import com.moko.loratracker.utils.SPUtiles;
 import com.moko.loratracker.utils.ToastUtils;
+import com.moko.support.MokoBleManager;
 import com.moko.support.MokoConstants;
 import com.moko.support.MokoSupport;
 import com.moko.support.OrderTaskAssembler;
@@ -397,7 +398,6 @@ public class MainActivity extends BaseActivity implements MokoScanDeviceCallback
             mHandler.postDelayed(() -> {
                 // open password notify and set passwrord
                 List<OrderTask> orderTasks = new ArrayList<>();
-                orderTasks.add(OrderTaskAssembler.openPasswordNotify());
                 orderTasks.add(OrderTaskAssembler.setPassword(mPassword));
                 MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
             }, 500);

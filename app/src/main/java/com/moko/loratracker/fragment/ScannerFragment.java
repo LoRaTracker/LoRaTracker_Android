@@ -25,7 +25,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.carbswang.android.numberpickerview.library.NumberPickerView;
 
-public class ScannerFragment extends Fragment implements SeekBar.OnSeekBarChangeListener {
+public class ScannerFragment extends Fragment {
     private static final String TAG = ScannerFragment.class.getSimpleName();
     @Bind(R.id.sb_scan_interval)
     SeekBar sbScanInterval;
@@ -66,39 +66,46 @@ public class ScannerFragment extends Fragment implements SeekBar.OnSeekBarChange
         View view = inflater.inflate(R.layout.fragment_scanner, container, false);
         ButterKnife.bind(this, view);
         activity = (DeviceInfoActivity) getActivity();
-        sbScanInterval.setOnSeekBarChangeListener(this);
-        sbAlarmTriggerRssi.setOnSeekBarChangeListener(this);
+        sbScanInterval.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                tvScanIntervalValue.setText(String.format("%ds", progress));
+                tvScanIntervalTips.setText(getString(R.string.storage_interval, progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        sbAlarmTriggerRssi.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                int value = progress - 127;
+                tvAlarmTriggerRssiValue.setText(String.format("%dBm", value));
+                tvAlarmTriggerRssiTips.setText(getString(R.string.alarm_trigger_rssi, value));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
         npvAlarmNotify.setDisplayedValues(getResources().getStringArray(R.array.tracking_notify));
         npvAlarmNotify.setMaxValue(3);
         npvAlarmNotify.setMinValue(0);
         npvAlarmNotify.setValue(0);
         return view;
-    }
-
-
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        switch (seekBar.getId()) {
-            case R.id.sb_scan_interval:
-                tvScanIntervalValue.setText(String.format("%ds", progress));
-                tvScanIntervalTips.setText(getString(R.string.storage_interval, progress));
-                break;
-            case R.id.sb_alarm_trigger_rssi:
-                int value = progress - 127;
-                tvAlarmTriggerRssiValue.setText(String.format("%dBm", value));
-                tvAlarmTriggerRssiTips.setText(getString(R.string.alarm_trigger_rssi, value));
-                break;
-        }
-    }
-
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-
-    }
-
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-
     }
 
     @Override
@@ -157,6 +164,6 @@ public class ScannerFragment extends Fragment implements SeekBar.OnSeekBarChange
     public void setAlarmTriggerRssi(int rssi) {
         int progress = rssi + 127;
         if (progress >= 0 && rssi <= 127)
-            sbScanInterval.setProgress(progress);
+            sbAlarmTriggerRssi.setProgress(progress);
     }
 }

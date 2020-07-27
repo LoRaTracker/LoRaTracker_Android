@@ -200,37 +200,6 @@
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:gravity="center_vertical"
-            android:text="Manufacture Date"
-            android:textColor="@color/black_333333"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:layout_constraintBaseline_toBaselineOf="@id/tv_manufacture_date"
-            app:layout_constraintLeft_toLeftOf="parent" />
-
-        <TextView
-            android:id="@+id/tv_manufacture_date"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginTop="20dp"
-            android:gravity="center_vertical"
-            android:text=""
-            android:textColor="@color/black_333333"
-            android:textSize="15sp"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_hardware_version" />
-
-        <View
-            style="@style/divider_line"
-            android:layout_width="0dp"
-            android:layout_marginTop="10dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_manufacture_date" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:gravity="center_vertical"
             android:text="Manufacture"
             android:textColor="@color/black_333333"
             android:textSize="15sp"
@@ -248,7 +217,7 @@
             android:textColor="@color/black_333333"
             android:textSize="15sp"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_manufacture_date" />
+            app:layout_constraintTop_toBottomOf="@id/tv_hardware_version" />
 
         <View
             style="@style/divider_line"

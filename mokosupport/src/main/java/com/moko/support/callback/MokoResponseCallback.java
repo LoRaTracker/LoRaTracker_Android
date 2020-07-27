@@ -17,7 +17,5 @@ public interface MokoResponseCallback {
 
     void onCharacteristicRead(byte[] value);
 
-    void onDescriptorWrite();
-
     void onServicesDiscovered(BluetoothGatt gatt);
 }

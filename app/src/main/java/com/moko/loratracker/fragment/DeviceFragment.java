@@ -28,8 +28,6 @@ public class DeviceFragment extends Fragment {
     TextView tvFirmwareVersion;
     @Bind(R.id.tv_hardware_version)
     TextView tvHardwareVersion;
-    @Bind(R.id.tv_manufacture_date)
-    TextView tvManufactureDate;
     @Bind(R.id.tv_manufacture)
     TextView tvManufacture;
 
@@ -103,10 +101,6 @@ public class DeviceFragment extends Fragment {
 
     public void setHardwareVersion(String hardwareVersion) {
         tvHardwareVersion.setText(hardwareVersion);
-    }
-
-    public void setManufactureDate(String manufactureDate) {
-        tvManufactureDate.setText(manufactureDate);
     }
 
     public void setManufacture(String manufacture) {
