@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">LoRaTracker</string>
+    <string name="app_name">LoRa Tracker</string>
 
     <string name="cancel">Cancel</string>
     <string name="ensure">OK</string>
