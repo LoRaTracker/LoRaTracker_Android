@@ -464,9 +464,9 @@ public class OrderTaskAssembler {
         return task;
     }
 
-    public static  OrderTask setLoraDR(int dr1, int dr2) {
+    public static  OrderTask setLoraDR(int dr1) {
         WriteConfigTask task = new WriteConfigTask();
-        task.setLoraDR(dr1, dr2);
+        task.setLoraDR(dr1);
         return task;
     }
 

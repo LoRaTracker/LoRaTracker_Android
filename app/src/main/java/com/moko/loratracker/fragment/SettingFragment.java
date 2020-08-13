@@ -16,7 +16,6 @@ import com.moko.loratracker.activity.DeviceInfoActivity;
 import com.moko.loratracker.activity.LoRaSettingActivity;
 import com.moko.loratracker.dialog.AlertMessageDialog;
 import com.moko.loratracker.dialog.ChangePasswordDialog;
-import com.moko.loratracker.dialog.ResetDialog;
 import com.moko.loratracker.dialog.ScanWindowDialog;
 
 import java.util.Timer;
@@ -126,17 +125,14 @@ public class SettingFragment extends Fragment {
 
 
     private void showResetDialog() {
-        final ResetDialog dialog = new ResetDialog(getActivity());
-        dialog.setOnPasswordClicked(password -> activity.reset());
-        dialog.show();
-        Timer resetTimer = new Timer();
-        resetTimer.schedule(new TimerTask() {
-
-            @Override
-            public void run() {
-                activity.runOnUiThread(() -> dialog.showKeyboard());
-            }
-        }, 200);
+        AlertMessageDialog dialog = new AlertMessageDialog();
+        dialog.setTitle("Factory Reset!");
+        dialog.setMessage("After factory reset,all the data will be reseted to the factory values.");
+        dialog.setCancel("Cancel");
+        dialog.setOnAlertConfirmListener(() -> {
+            activity.reset();
+        });
+        dialog.show(activity.getSupportFragmentManager());
     }
 
     private void showChangePasswordDialog() {

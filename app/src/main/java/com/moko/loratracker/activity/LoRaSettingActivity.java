@@ -68,8 +68,6 @@ public class LoRaSettingActivity extends BaseActivity {
     TextView tvCh2;
     @Bind(R.id.tv_dr_1)
     TextView tvDr1;
-    @Bind(R.id.tv_dr_2)
-    TextView tvDr2;
     @Bind(R.id.tv_connect)
     TextView tvConnect;
     @Bind(R.id.cb_adr)
@@ -94,9 +92,9 @@ public class LoRaSettingActivity extends BaseActivity {
     private int mSelectedCh1;
     private int mSelectedCh2;
     private int mSelectedDr1;
-    private int mSelectedDr2;
+    private int mMaxCH;
+    private int mMaxDR;
     private boolean mIsFailed;
-    private boolean mReadCHDR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,10 +170,6 @@ public class LoRaSettingActivity extends BaseActivity {
             if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
             }
             if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
-                if (mReadCHDR) {
-                    mReadCHDR = false;
-                    return;
-                }
                 dismissSyncProgressDialog();
             }
             if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
@@ -271,18 +265,10 @@ public class LoRaSettingActivity extends BaseActivity {
                                         final int region = value[3] & 0xFF;
                                         mSelectedRegion = region;
                                         tvRegion.setText(mRegions[region]);
+                                        initCHDRRange();
                                     }
-                                    if (header == 0xEF) {
-                                        if ((value[3] & 0xff) != 1) {
-                                            mIsFailed = true;
-                                        } else {
-                                            if (mReadCHDR) {
-                                                List<OrderTask> orderTasks = new ArrayList<>();
-                                                orderTasks.add(OrderTaskAssembler.getLoraCH());
-                                                orderTasks.add(OrderTaskAssembler.getLoraDR());
-                                                MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
-                                            }
-                                        }
+                                    if (header == 0xEF && (value[3] & 0xff) != 1) {
+                                        mIsFailed = true;
                                     }
                                     break;
                                 case KEY_LORA_MESSAGE_TYPE:
@@ -320,11 +306,8 @@ public class LoRaSettingActivity extends BaseActivity {
                                 case KEY_LORA_DR:
                                     if (header == 0xED && length > 1) {
                                         final int dr1 = value[3] & 0xFF;
-                                        final int dr2 = value[4] & 0xFF;
                                         mSelectedDr1 = dr1;
-                                        mSelectedDr2 = dr2;
                                         tvDr1.setText(String.format("DR%d", dr1));
-                                        tvDr2.setText(String.format("DR%d", dr2));
                                     }
                                     if (header == 0xEF && (value[3] & 0xff) != 1) {
                                         mIsFailed = true;
@@ -438,11 +421,11 @@ public class LoRaSettingActivity extends BaseActivity {
         RegionBottomDialog bottomDialog = new RegionBottomDialog();
         bottomDialog.setDatas(mRegionsList, mSelectedRegion);
         bottomDialog.setListener(value -> {
-            mReadCHDR = true;
-            mSelectedRegion = value;
-            tvRegion.setText(mRegions[mSelectedRegion]);
-            showSyncingProgressDialog();
-            MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setLoraRegion(mSelectedRegion));
+            if (mSelectedRegion != value) {
+                mSelectedRegion = value;
+                tvRegion.setText(mRegions[mSelectedRegion]);
+                updateCHDR();
+            }
         });
         bottomDialog.show(getSupportFragmentManager());
     }
@@ -459,20 +442,85 @@ public class LoRaSettingActivity extends BaseActivity {
         }
     }
 
-    private static ArrayList<String> mCHList;
-    private static ArrayList<String> mDRList;
+    private void updateCHDR() {
+        switch (mSelectedRegion) {
+            case 0:
+            case 4:
+            case 9:
+            case 10:
+                mSelectedCh1 = 0;
+                mSelectedCh2 = 2;
+                mSelectedDr1 = 0;
+                break;
+            case 1:
+            case 5:
+                mSelectedCh1 = 0;
+                mSelectedCh2 = 7;
+                mSelectedDr1 = 2;
+                break;
+            case 3:
+                mSelectedCh1 = 0;
+                mSelectedCh2 = 5;
+                mSelectedDr1 = 0;
+                break;
+            case 7:
+                mSelectedCh1 = 0;
+                mSelectedCh2 = 7;
+                mSelectedDr1 = 0;
+                break;
+            case 8:
+                mSelectedCh1 = 0;
+                mSelectedCh2 = 1;
+                mSelectedDr1 = 0;
+                break;
+        }
 
-    static {
+        tvCh1.setText(String.valueOf(mSelectedCh1));
+        tvCh2.setText(String.valueOf(mSelectedCh2));
+        tvDr1.setText(String.format("DR%d", mSelectedDr1));
+        cbAdr.setChecked(true);
+    }
+
+    private ArrayList<String> mCHList;
+    private ArrayList<String> mDRList;
+
+    private void initCHDRRange() {
         mCHList = new ArrayList<>();
-        for (int i = 0; i <= 95; i++) {
+        mDRList = new ArrayList<>();
+        switch (mSelectedRegion) {
+            case 0:
+            case 3:
+            case 4:
+            case 8:
+            case 9:
+            case 10:
+                // EU868、CN779、EU443、AS923、KR920、IN865
+                mMaxCH = 15;
+                mMaxDR = 5;
+                break;
+            case 1:
+                // US915
+                mMaxCH = 63;
+                mMaxDR = 4;
+                break;
+            case 5:
+                // AU915
+                mMaxCH = 63;
+                mMaxDR = 6;
+                break;
+            case 7:
+                // CN470
+                mMaxCH = 95;
+                mMaxDR = 5;
+                break;
+        }
+        for (int i = 0; i <= mMaxCH; i++) {
             mCHList.add(i + "");
         }
-        mDRList = new ArrayList<>();
-        for (int i = 0; i <= 15; i++) {
+        for (int i = 0; i <= mMaxDR; i++) {
             mDRList.add("DR" + i);
         }
     }
-
 
     public void selectCh1(View view) {
         BottomDialog bottomDialog = new BottomDialog();
@@ -490,7 +538,7 @@ public class LoRaSettingActivity extends BaseActivity {
 
     public void selectCh2(View view) {
         final ArrayList<String> ch2List = new ArrayList<>();
-        for (int i = mSelectedCh1; i <= 95; i++) {
+        for (int i = mSelectedCh1; i <= mMaxCH; i++) {
             ch2List.add(i + "");
         }
         BottomDialog bottomDialog = new BottomDialog();
@@ -503,29 +551,15 @@ public class LoRaSettingActivity extends BaseActivity {
     }
 
     public void selectDr1(View view) {
+        if (cbAdr.isChecked()) {
+
+            return;
+        }
         BottomDialog bottomDialog = new BottomDialog();
         bottomDialog.setDatas(mDRList, mSelectedDr1);
         bottomDialog.setListener(value -> {
             mSelectedDr1 = value;
             tvDr1.setText(mDRList.get(value));
-            if (mSelectedDr1 > mSelectedDr2) {
-                mSelectedDr2 = mSelectedDr1;
-                tvDr2.setText(mDRList.get(value));
-            }
-        });
-        bottomDialog.show(getSupportFragmentManager());
-    }
-
-    public void selectDr2(View view) {
-        final ArrayList<String> dr2List = new ArrayList<>();
-        for (int i = mSelectedDr1; i <= 15; i++) {
-            dr2List.add("DR" + i);
-        }
-        BottomDialog bottomDialog = new BottomDialog();
-        bottomDialog.setDatas(dr2List, mSelectedDr2 - mSelectedDr1);
-        bottomDialog.setListener(value -> {
-            mSelectedDr2 = value + mSelectedDr1;
-            tvDr2.setText(dr2List.get(value));
         });
         bottomDialog.show(getSupportFragmentManager());
     }
@@ -590,7 +624,7 @@ public class LoRaSettingActivity extends BaseActivity {
         // 保存并连接
         orderTasks.add(OrderTaskAssembler.setLoraRegion(mSelectedRegion));
         orderTasks.add(OrderTaskAssembler.setLoraCH(mSelectedCh1, mSelectedCh2));
-        orderTasks.add(OrderTaskAssembler.setLoraDR(mSelectedDr1, mSelectedDr2));
+        orderTasks.add(OrderTaskAssembler.setLoraDR(mSelectedDr1));
         orderTasks.add(OrderTaskAssembler.setLoraADR(cbAdr.isChecked() ? 1 : 0));
         orderTasks.add(OrderTaskAssembler.setLoraConnect());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));

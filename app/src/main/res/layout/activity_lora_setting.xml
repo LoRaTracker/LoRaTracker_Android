@@ -439,16 +439,6 @@
                         android:gravity="center"
                         android:onClick="selectDr1"
                         android:text="" />
-
-                    <TextView
-                        android:id="@+id/tv_dr_2"
-                        android:layout_width="90dp"
-                        android:layout_height="40dp"
-                        android:layout_marginLeft="10dp"
-                        android:background="@drawable/shape_radius_edit_bg"
-                        android:gravity="center"
-                        android:onClick="selectDr2"
-                        android:text="" />
                 </LinearLayout>
 
                 <View

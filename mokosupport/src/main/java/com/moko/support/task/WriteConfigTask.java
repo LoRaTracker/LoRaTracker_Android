@@ -437,13 +437,12 @@ public class WriteConfigTask extends OrderTask {
         data[4] = (byte) ch2;
     }
 
-    public void setLoraDR(int dr1, int dr2) {
-        data = new byte[5];
+    public void setLoraDR(int dr1) {
+        data = new byte[4];
         data[0] = (byte) 0xEF;
         data[1] = (byte) ConfigKeyEnum.KEY_LORA_DR.getConfigKey();
         data[2] = (byte) 0x02;
         data[3] = (byte) dr1;
-        data[4] = (byte) dr2;
     }
 
     public void setLoraADR(int adr) {

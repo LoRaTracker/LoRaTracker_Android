@@ -364,7 +364,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     }
 
     private void showDisconnectDialog() {
-        if (disConnectType == 1) {
+        if (disConnectType == 2) {
             AlertMessageDialog dialog = new AlertMessageDialog();
             dialog.setTitle("Change Password");
             dialog.setMessage("Password changed successfully!Please reconnect the device.");
@@ -375,7 +375,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                 finish();
             });
             dialog.show(getSupportFragmentManager());
-        } else if (disConnectType == 2) {
+        } else if (disConnectType == 3) {
             AlertMessageDialog dialog = new AlertMessageDialog();
             dialog.setTitle("Factory Reset");
             dialog.setMessage("Factory reset successfully!Please reconnect the device.");
@@ -386,7 +386,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                 finish();
             });
             dialog.show(getSupportFragmentManager());
-        } else if (disConnectType == 3) {
+        } else if (disConnectType == 4) {
             AlertMessageDialog dialog = new AlertMessageDialog();
             dialog.setMessage("No data communication for 2 minutes, the device is disconnected.");
             dialog.setConfirm("OK");
@@ -396,7 +396,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                 finish();
             });
             dialog.show(getSupportFragmentManager());
-        } else if (disConnectType == 4) {
+        } else if (disConnectType == 1) {
             AlertMessageDialog dialog = new AlertMessageDialog();
             dialog.setMessage("The Beacon is disconnected.");
             dialog.setConfirm("OK");
@@ -607,6 +607,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         orderTasks.add(OrderTaskAssembler.getLoRaConnectable());
         orderTasks.add(OrderTaskAssembler.getScanWindow());
         orderTasks.add(OrderTaskAssembler.getConnectable());
+        orderTasks.add(OrderTaskAssembler.getMacAddress());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
@@ -663,7 +664,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
     public void setScanWindow(int scannerState, int startTime) {
         showSyncingProgressDialog();
-        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setScanWindow(scannerState, startTime));
+        MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setScanWindow(scannerState, startTime), OrderTaskAssembler.getScanWindow());
     }
 
     public void changeConnectState(int connectState) {

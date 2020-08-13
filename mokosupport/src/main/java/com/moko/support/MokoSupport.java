@@ -102,13 +102,14 @@ public class MokoSupport implements MokoResponseCallback {
 
             @Override
             public void onDeviceDisconnecting(@NonNull BluetoothDevice device) {
-                if (isSyncData()) {
-                    mQueue.clear();
-                }
+
             }
 
             @Override
             public void onDeviceDisconnected(@NonNull BluetoothDevice device) {
+                if (isSyncData()) {
+                    mQueue.clear();
+                }
                 ConnectStatusEvent connectStatusEvent = new ConnectStatusEvent();
                 connectStatusEvent.setAction(MokoConstants.ACTION_CONN_STATUS_DISCONNECTED);
                 EventBus.getDefault().post(connectStatusEvent);

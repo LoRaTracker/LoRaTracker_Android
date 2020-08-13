@@ -47,7 +47,7 @@ public abstract class OrderTask {
             if (orderStatus != OrderTask.ORDER_STATUS_SUCCESS) {
                 if (timeoutPreTask()) {
                     MokoSupport.getInstance().pollTask();
-                    OrderTaskResponseEvent event =new OrderTaskResponseEvent();
+                    OrderTaskResponseEvent event = new OrderTaskResponseEvent();
                     event.setAction(MokoConstants.ACTION_ORDER_TIMEOUT);
                     event.setResponse(response);
                     EventBus.getDefault().post(event);
