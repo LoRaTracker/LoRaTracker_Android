@@ -36,7 +36,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1000ms"
+                android:text="500ms"
                 android:textColor="@color/grey_999999"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toTopOf="@id/sb_scan_window"
@@ -57,12 +57,12 @@
                 android:layout_width="0dp"
                 android:layout_height="30dp"
                 android:layout_marginTop="20dp"
-                android:max="4"
+                android:max="3"
                 android:maxHeight="2dp"
                 android:minHeight="2dp"
                 android:paddingStart="0dp"
                 android:paddingEnd="0dp"
-                android:progress="2"
+                android:progress="0"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

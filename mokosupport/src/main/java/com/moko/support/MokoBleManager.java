@@ -99,7 +99,9 @@ public class MokoBleManager extends BleManager<BleManagerCallbacks> {
         @Override
         protected void onDescriptorWrite(@NonNull BluetoothGatt gatt, @NonNull BluetoothGattDescriptor descriptor) {
             LogModule.e("onDescriptorWrite");
-            mMokoResponseCallback.onServicesDiscovered(gatt);
+            String characteristicUUIDStr = descriptor.getCharacteristic().getUuid().toString().toLowerCase();
+            if (paramsConfigCharacteristic.getUuid().toString().toLowerCase().equals(characteristicUUIDStr))
+                mMokoResponseCallback.onServicesDiscovered(gatt);
         }
 
     }
