@@ -387,7 +387,7 @@ public class MainActivity extends BaseActivity implements MokoScanDeviceCallback
             mPassword = "";
             dismissLoadingProgressDialog();
             dismissLoadingMessageDialog();
-            ToastUtils.showToast(MainActivity.this, "Disconnected");
+            ToastUtils.showToast(MainActivity.this, "Connection Failed");
             if (animation == null) {
                 startScan();
             }

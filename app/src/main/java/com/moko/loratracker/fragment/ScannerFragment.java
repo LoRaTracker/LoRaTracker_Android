@@ -163,7 +163,11 @@ public class ScannerFragment extends Fragment {
 
     public void setAlarmTriggerRssi(int rssi) {
         int progress = rssi + 127;
-        if (progress >= 0 && rssi <= 127)
+        if (progress >= 0 && rssi <= 127) {
             sbAlarmTriggerRssi.setProgress(progress);
+            int value = progress - 127;
+            tvAlarmTriggerRssiValue.setText(String.format("%dBm", value));
+            tvAlarmTriggerRssiTips.setText(getString(R.string.alarm_trigger_rssi, value));
+        }
     }
 }

@@ -128,7 +128,7 @@ public class SettingFragment extends Fragment {
         AlertMessageDialog dialog = new AlertMessageDialog();
         dialog.setTitle("Factory Reset!");
         dialog.setMessage("After factory reset,all the data will be reseted to the factory values.");
-        dialog.setCancel("Cancel");
+        dialog.setConfirm("OK");
         dialog.setOnAlertConfirmListener(() -> {
             activity.reset();
         });
@@ -188,7 +188,6 @@ public class SettingFragment extends Fragment {
             dialog.setMessage("Are you sure to make the device connectable？");
         }
         dialog.setConfirm("OK");
-        dialog.setCancelGone();
         dialog.setOnAlertConfirmListener(() -> {
             int value = !connectState ? 1 : 0;
             activity.changeConnectState(value);
@@ -201,7 +200,6 @@ public class SettingFragment extends Fragment {
         dialog.setTitle("Warning!");
         dialog.setMessage("Are you sure to turn off the device? Please make sure the device has a button to turn on!");
         dialog.setConfirm("OK");
-        dialog.setCancelGone();
         dialog.setOnAlertConfirmListener(() -> {
             activity.powerOff();
         });

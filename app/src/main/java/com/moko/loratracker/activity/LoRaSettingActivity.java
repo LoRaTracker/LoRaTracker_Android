@@ -304,7 +304,7 @@ public class LoRaSettingActivity extends BaseActivity {
                                     }
                                     break;
                                 case KEY_LORA_DR:
-                                    if (header == 0xED && length > 1) {
+                                    if (header == 0xED && length > 0) {
                                         final int dr1 = value[3] & 0xFF;
                                         mSelectedDr1 = dr1;
                                         tvDr1.setText(String.format("DR%d", dr1));
@@ -452,7 +452,6 @@ public class LoRaSettingActivity extends BaseActivity {
                 mSelectedCh2 = 2;
                 mSelectedDr1 = 0;
                 break;
-            case 1:
             case 5:
                 mSelectedCh1 = 0;
                 mSelectedCh2 = 7;
@@ -463,6 +462,7 @@ public class LoRaSettingActivity extends BaseActivity {
                 mSelectedCh2 = 5;
                 mSelectedDr1 = 0;
                 break;
+            case 1:
             case 7:
                 mSelectedCh1 = 0;
                 mSelectedCh2 = 7;
@@ -471,7 +471,7 @@ public class LoRaSettingActivity extends BaseActivity {
             case 8:
                 mSelectedCh1 = 0;
                 mSelectedCh2 = 1;
-                mSelectedDr1 = 0;
+                mSelectedDr1 = 2;
                 break;
         }
 
@@ -567,14 +567,20 @@ public class LoRaSettingActivity extends BaseActivity {
     public void onConnect(View view) {
         ArrayList<OrderTask> orderTasks = new ArrayList<>();
         if (mSelectedMode == 0) {
+            String devEui = etDevEui.getText().toString();
+            String appEui = etAppEui.getText().toString();
             String devAddr = etDevAddr.getText().toString();
-            String nwkSkey = etNwkSkey.getText().toString();
             String appSkey = etAppSkey.getText().toString();
-            if (devAddr.length() != 8) {
+            String nwkSkey = etNwkSkey.getText().toString();
+            if (devEui.length() != 16) {
                 ToastUtils.showToast(this, "data length error");
                 return;
             }
-            if (nwkSkey.length() != 32) {
+            if (appEui.length() != 16) {
+                ToastUtils.showToast(this, "data length error");
+                return;
+            }
+            if (devAddr.length() != 8) {
                 ToastUtils.showToast(this, "data length error");
                 return;
             }
@@ -582,9 +588,15 @@ public class LoRaSettingActivity extends BaseActivity {
                 ToastUtils.showToast(this, "data length error");
                 return;
             }
+            if (nwkSkey.length() != 32) {
+                ToastUtils.showToast(this, "data length error");
+                return;
+            }
+            orderTasks.add(OrderTaskAssembler.setLoraDevEui(devEui));
+            orderTasks.add(OrderTaskAssembler.setLoraAppEui(appEui));
             orderTasks.add(OrderTaskAssembler.setLoraDevAddr(devAddr));
-            orderTasks.add(OrderTaskAssembler.setLoraNwkSKey(nwkSkey));
             orderTasks.add(OrderTaskAssembler.setLoraAppSKey(appSkey));
+            orderTasks.add(OrderTaskAssembler.setLoraNwkSKey(nwkSkey));
             orderTasks.add(OrderTaskAssembler.setLoraUploadMode(mSelectedMode + 1));
         } else {
             String devEui = etDevEui.getText().toString();

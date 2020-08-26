@@ -441,7 +441,7 @@ public class WriteConfigTask extends OrderTask {
         data = new byte[4];
         data[0] = (byte) 0xEF;
         data[1] = (byte) ConfigKeyEnum.KEY_LORA_DR.getConfigKey();
-        data[2] = (byte) 0x02;
+        data[2] = (byte) 0x01;
         data[3] = (byte) dr1;
     }
 

@@ -81,6 +81,60 @@
                 style="@style/divider_line"
                 android:layout_marginTop="10dp" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DevEUI"
+                    android:textColor="@color/black_333333"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/et_dev_eui"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1.0"
+                    android:digits="0123456789abcdefABCDEF"
+                    android:maxLength="16"
+                    android:singleLine="true"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AppEUI"
+                    android:textColor="@color/black_333333"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/et_app_eui"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1.0"
+                    android:digits="0123456789abcdefABCDEF"
+                    android:maxLength="16"
+                    android:singleLine="true"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -91,60 +145,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:visibility="gone">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="6dp"
-                        android:paddingBottom="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="DevEUI"
-                            android:textColor="@color/black_333333"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <EditText
-                            android:id="@+id/et_dev_eui"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_marginLeft="10dp"
-                            android:layout_weight="1.0"
-                            android:digits="0123456789abcdefABCDEF"
-                            android:maxLength="16"
-                            android:singleLine="true"
-                            android:textSize="15sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="6dp"
-                        android:paddingBottom="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="AppEUI"
-                            android:textColor="@color/black_333333"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <EditText
-                            android:id="@+id/et_app_eui"
-                            android:layout_width="0dp"
-                            android:layout_height="40dp"
-                            android:layout_marginLeft="10dp"
-                            android:layout_weight="1.0"
-                            android:digits="0123456789abcdefABCDEF"
-                            android:maxLength="16"
-                            android:singleLine="true"
-                            android:textSize="15sp" />
-
-                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -180,6 +180,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:visibility="visible">
+
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -217,13 +218,13 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="NwkSKey"
+                            android:text="AppSKey"
                             android:textColor="@color/black_333333"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
                         <EditText
-                            android:id="@+id/et_nwk_skey"
+                            android:id="@+id/et_app_skey"
                             android:layout_width="0dp"
                             android:layout_height="40dp"
                             android:layout_marginLeft="10dp"
@@ -244,13 +245,13 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="AppSKey"
+                            android:text="NwkSKey"
                             android:textColor="@color/black_333333"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
                         <EditText
-                            android:id="@+id/et_app_skey"
+                            android:id="@+id/et_nwk_skey"
                             android:layout_width="0dp"
                             android:layout_height="40dp"
                             android:layout_marginLeft="10dp"
