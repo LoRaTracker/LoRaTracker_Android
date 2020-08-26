@@ -145,9 +145,9 @@ public class LoRaSettingActivity extends BaseActivity {
             orderTasks.add(OrderTaskAssembler.getLoraRegion());
             orderTasks.add(OrderTaskAssembler.getLoraMessageType());
             orderTasks.add(OrderTaskAssembler.getLoraReportInterval());
-//            orderTasks.add(OrderTaskAssembler.getLoraCH());
-//            orderTasks.add(OrderTaskAssembler.getLoraDR());
-//            orderTasks.add(OrderTaskAssembler.getLoraADR());
+            orderTasks.add(OrderTaskAssembler.getLoraCH());
+            orderTasks.add(OrderTaskAssembler.getLoraDR());
+            orderTasks.add(OrderTaskAssembler.getLoraADR());
             MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         }
     }
@@ -635,9 +635,9 @@ public class LoRaSettingActivity extends BaseActivity {
         mIsFailed = false;
         // 保存并连接
         orderTasks.add(OrderTaskAssembler.setLoraRegion(mSelectedRegion));
-//        orderTasks.add(OrderTaskAssembler.setLoraCH(mSelectedCh1, mSelectedCh2));
-//        orderTasks.add(OrderTaskAssembler.setLoraDR(mSelectedDr1));
-//        orderTasks.add(OrderTaskAssembler.setLoraADR(cbAdr.isChecked() ? 1 : 0));
+        orderTasks.add(OrderTaskAssembler.setLoraCH(mSelectedCh1, mSelectedCh2));
+        orderTasks.add(OrderTaskAssembler.setLoraDR(mSelectedDr1));
+        orderTasks.add(OrderTaskAssembler.setLoraADR(cbAdr.isChecked() ? 1 : 0));
         orderTasks.add(OrderTaskAssembler.setLoraConnect());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         showSyncingProgressDialog();
