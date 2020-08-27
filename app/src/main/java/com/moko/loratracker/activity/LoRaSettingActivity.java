@@ -424,6 +424,7 @@ public class LoRaSettingActivity extends BaseActivity {
             if (mSelectedRegion != value) {
                 mSelectedRegion = value;
                 tvRegion.setText(mRegions[mSelectedRegion]);
+                initCHDRRange();
                 updateCHDR();
             }
         });
@@ -478,7 +479,6 @@ public class LoRaSettingActivity extends BaseActivity {
         tvCh1.setText(String.valueOf(mSelectedCh1));
         tvCh2.setText(String.valueOf(mSelectedCh2));
         tvDr1.setText(String.format("DR%d", mSelectedDr1));
-        cbAdr.setChecked(true);
     }
 
     private ArrayList<String> mCHList;
@@ -552,7 +552,6 @@ public class LoRaSettingActivity extends BaseActivity {
 
     public void selectDr1(View view) {
         if (cbAdr.isChecked()) {
-
             return;
         }
         BottomDialog bottomDialog = new BottomDialog();
