@@ -370,11 +370,42 @@
                 style="@style/divider_line"
                 android:layout_marginTop="10dp" />
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <CheckBox
+                    android:id="@+id/cb_advance_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:button="@null"
+                    android:drawableRight="@drawable/selector_cb_btn"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:text="Advanced Setting(Optional)"
+                    android:textColor="@color/blue_2f84d0"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/cb_advance_setting"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:text="Note:Please do not modify advanced settings unless necessary."
+                    android:textColor="@color/black_333333"
+                    android:textSize="15sp" />
+            </RelativeLayout>
+
             <LinearLayout
+                android:id="@+id/ll_advanced_setting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:visibility="gone">
+
+                <View style="@style/divider_line" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

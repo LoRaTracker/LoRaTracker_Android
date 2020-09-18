@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -41,7 +42,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class LoRaSettingActivity extends BaseActivity {
+public class LoRaSettingActivity extends BaseActivity implements CompoundButton.OnCheckedChangeListener {
 
 
     @Bind(R.id.et_dev_eui)
@@ -78,6 +79,10 @@ public class LoRaSettingActivity extends BaseActivity {
     TextView tvRegion;
     @Bind(R.id.tv_message_type)
     TextView tvMessageType;
+    @Bind(R.id.ll_advanced_setting)
+    LinearLayout llAdvancedSetting;
+    @Bind(R.id.cb_advance_setting)
+    CheckBox cbAdvanceSetting;
 
     private boolean mReceiverTag = false;
     private ArrayList<String> mModeList;
@@ -124,6 +129,7 @@ public class LoRaSettingActivity extends BaseActivity {
         for (int i = 0, l = mMessageType.length; i < l; i++) {
             mMessageTypeList.add(mMessageType[i]);
         }
+        cbAdvanceSetting.setOnCheckedChangeListener(this);
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
@@ -640,5 +646,10 @@ public class LoRaSettingActivity extends BaseActivity {
         orderTasks.add(OrderTaskAssembler.setLoraConnect());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         showSyncingProgressDialog();
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        llAdvancedSetting.setVisibility(isChecked ? View.VISIBLE : View.GONE);
     }
 }
