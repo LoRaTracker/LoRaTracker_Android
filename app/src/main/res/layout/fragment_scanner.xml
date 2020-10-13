@@ -141,6 +141,111 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/npv_alarm_notify" />
 
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="Vibration Intensity"
+            android:textColor="@color/black_333333"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/npv_vibration_intensity"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@id/npv_vibration_intensity" />
+
+        <cn.carbswang.android.numberpickerview.library.NumberPickerView
+            android:id="@+id/npv_vibration_intensity"
+            android:layout_width="120dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/shape_stroke_blue_bg"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/npv_alarm_notify"
+            app:npv_DividerColor="@color/blue_2f84d0"
+            app:npv_DividerMarginLeft="15dp"
+            app:npv_DividerMarginRight="15dp"
+            app:npv_TextArray="@array/vibration_intensity"
+            app:npv_TextColorNormal="@color/grey_b3b3b3"
+            app:npv_TextColorSelected="@color/blue_2f84d0"
+            app:npv_TextSizeNormal="10sp"
+            app:npv_TextSizeSelected="13sp"
+            app:npv_WrapSelectorWheel="false" />
+
+        <View
+            style="@style/divider_line"
+            android:layout_width="0dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/npv_vibration_intensity" />
+
+        <EditText
+            android:id="@+id/et_vibration_cycle"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:hint="1~600s"
+            android:inputType="number"
+            android:maxLength="3"
+            android:textColor="@color/black_333333"
+            android:textSize="15sp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/npv_vibration_intensity" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="Vibration Cycle"
+            android:textColor="@color/black_333333"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/et_vibration_cycle"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@id/et_vibration_cycle" />
+
+        <View
+            style="@style/divider_line"
+            android:layout_width="0dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_vibration_cycle" />
+
+        <EditText
+            android:id="@+id/et_vibration_duration"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:hint="0~10s"
+            android:inputType="number"
+            android:maxLength="3"
+            android:textColor="@color/black_333333"
+            android:textSize="15sp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_vibration_cycle" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="Duration Of Vibration"
+            android:textColor="@color/black_333333"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/et_vibration_duration"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@id/et_vibration_duration" />
+
+        <View
+            style="@style/divider_line"
+            android:layout_width="0dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_vibration_duration" />
 
         <TextView
             android:id="@+id/alarm_trigger_rssi"
@@ -178,7 +283,7 @@
             android:progress="0"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/tv_alarm_trigger_rssi_value"
-            app:layout_constraintTop_toBottomOf="@id/npv_alarm_notify" />
+            app:layout_constraintTop_toBottomOf="@id/et_vibration_duration" />
 
         <TextView
             android:id="@+id/tv_alarm_trigger_rssi_value"

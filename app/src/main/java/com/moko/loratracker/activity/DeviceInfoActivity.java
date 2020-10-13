@@ -355,6 +355,25 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                         deviceFragment.setBatteryValtage(battery);
                                     }
                                     break;
+                                case KEY_VIBRATION_INTENSITY:
+                                    if (header == 0xED && length > 0) {
+                                        int intansity = value[3] & 0xFF;
+                                        scannerFragment.setVibrationIntansity(intansity);
+                                    }
+                                    break;
+                                case KEY_VIBRATION_DURATION:
+                                    if (header == 0xED && length > 0) {
+                                        int duration = value[3] & 0xFF;
+                                        scannerFragment.setVibrationDuration(duration);
+                                    }
+                                    break;
+                                case KEY_VIBRATION_CYCLE:
+                                    if (header == 0xED && length > 0) {
+                                        byte[] cycleBytes = Arrays.copyOfRange(value, 3, 3 + length);
+                                        int cycle = MokoUtils.toInt(cycleBytes);
+                                        scannerFragment.setVibrationCycle(cycle);
+                                    }
+                                    break;
                             }
                         }
                         break;
@@ -531,8 +550,14 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                     }
                 }
                 if (radioBtnScanner.isChecked()) {
-                    showSyncingProgressDialog();
-                    scannerFragment.saveParams();
+                    if (scannerFragment.isValid()) {
+                        if (scannerFragment.isDurationLessThanCycle()) {
+                            showSyncingProgressDialog();
+                            scannerFragment.saveParams();
+                        }
+                    } else {
+                        ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
+                    }
                 }
                 break;
         }
@@ -626,6 +651,9 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         orderTasks.add(OrderTaskAssembler.getScanInterval());
         orderTasks.add(OrderTaskAssembler.getAlarmNotify());
         orderTasks.add(OrderTaskAssembler.getAlarmRssi());
+        orderTasks.add(OrderTaskAssembler.getVibrationIntansity());
+        orderTasks.add(OrderTaskAssembler.getVibrationCycle());
+        orderTasks.add(OrderTaskAssembler.getVibrationDuration());
         MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 

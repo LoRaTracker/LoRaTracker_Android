@@ -44,6 +44,9 @@ public enum ConfigKeyEnum implements Serializable {
     KEY_FILTER_ADV_RAW_DATA(0x25),
     KEY_LORA_CONNECT(0x23),
     KEY_CLOSE(0x24),
+    KEY_VIBRATION_INTENSITY(0x27),
+    KEY_VIBRATION_DURATION(0x28),
+    KEY_VIBRATION_CYCLE(0x29),
     ;
 
     private int configKey;

@@ -64,6 +64,9 @@ public class WriteConfigTask extends OrderTask {
             case KEY_LORA_CH:
             case KEY_LORA_DR:
             case KEY_LORA_ADR:
+            case KEY_VIBRATION_INTENSITY:
+            case KEY_VIBRATION_CYCLE:
+            case KEY_VIBRATION_DURATION:
                 createGetConfigData(key.getConfigKey());
                 break;
         }
@@ -459,5 +462,31 @@ public class WriteConfigTask extends OrderTask {
         data[1] = (byte) ConfigKeyEnum.KEY_LORA_CONNECT.getConfigKey();
         data[2] = (byte) 0x01;
         data[3] = (byte) 0x01;
+    }
+
+    public void setVibrationIntensity(@IntRange(from = 0, to = 100) int intensity) {
+        data = new byte[4];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.KEY_VIBRATION_INTENSITY.getConfigKey();
+        data[2] = (byte) 0x01;
+        data[3] = (byte) intensity;
+    }
+
+    public void setVibrationDuration(@IntRange(from = 0, to = 255) int duration) {
+        data = new byte[4];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.KEY_VIBRATION_DURATION.getConfigKey();
+        data[2] = (byte) 0x01;
+        data[3] = (byte) duration;
+    }
+
+    public void setVibrationCycle(@IntRange(from = 1, to = 600) int cycle) {
+        byte[] cycleBytes = MokoUtils.toByteArray(cycle, 2);
+        data = new byte[5];
+        data[0] = (byte) 0xEF;
+        data[1] = (byte) ConfigKeyEnum.KEY_VIBRATION_CYCLE.getConfigKey();
+        data[2] = (byte) 0x02;
+        data[3] = cycleBytes[0];
+        data[4] = cycleBytes[1];
     }
 }
