@@ -146,7 +146,7 @@
             android:layout_marginTop="20dp"
             android:drawableRight="@drawable/arrow_right"
             android:gravity="center_vertical"
-            android:text="Scanner Window(500ms/1000ms)"
+            android:text="Scanner Window(1/2)"
             android:textColor="@color/black_333333"
             android:textSize="15sp"
             android:textStyle="bold"

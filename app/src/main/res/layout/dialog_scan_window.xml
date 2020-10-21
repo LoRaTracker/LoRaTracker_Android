@@ -36,7 +36,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="500ms"
+                android:text="1/2"
                 android:textColor="@color/grey_999999"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toTopOf="@id/sb_scan_window"
@@ -45,7 +45,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0ms"
+                android:text="0"
                 android:textColor="@color/grey_999999"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toTopOf="@id/sb_scan_window"
@@ -72,7 +72,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="right"
-                android:text="500ms/1000ms"
+                android:text="1/2"
                 android:textColor="@color/black_333333"
                 android:textSize="15sp"
                 app:layout_constraintLeft_toLeftOf="parent"

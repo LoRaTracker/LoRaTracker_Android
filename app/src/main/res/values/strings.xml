@@ -37,7 +37,7 @@
     <string name="title_setting">SETTINGS</string>
     <string name="title_device">DEVICE</string>
     <string name="lora_setting">LoRa Settings</string>
-    <string name="scan_window_tips">The scan duration of every 1000ms.\nIf you set the duration to 0ms,the Beacon will stop scanning.</string>
+    <string name="scan_window_tips">The setting of the scanning window represents the proportion of the scanning time. If you set to 0, the device will stop scanning.</string>
 
     <string-array name="tracking_notify">
         <item>Off</item>

@@ -55,6 +55,8 @@ public class GetFilterAdvRawData extends OrderTask {
                     responseValue[i + 3] = rawDataBytes[i];
                 }
                 response.responseValue = responseValue;
+            } else {
+                response.responseValue = value;
             }
             orderStatus = OrderTask.ORDER_STATUS_SUCCESS;
             MokoSupport.getInstance().pollTask();

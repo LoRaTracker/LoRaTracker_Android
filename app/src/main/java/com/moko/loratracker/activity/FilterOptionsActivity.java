@@ -250,12 +250,12 @@ public class FilterOptionsActivity extends BaseActivity implements SeekBar.OnSee
                                     break;
                                 case KEY_FILTER_ADV_RAW_DATA:
                                     if (header == 0xED) {
-                                        filterRawAdvDataEnable = value != null;
+                                        filterRawAdvDataEnable = value != null && value.length > 5;
                                         ivRawAdvData.setImageResource(filterRawAdvDataEnable ? R.drawable.ic_checked : R.drawable.ic_unchecked);
                                         llRawDataFilter.setVisibility(filterRawAdvDataEnable ? View.VISIBLE : View.GONE);
                                         ivRawDataAdd.setVisibility(filterRawAdvDataEnable ? View.VISIBLE : View.GONE);
                                         ivRawDataDel.setVisibility(filterRawAdvDataEnable ? View.VISIBLE : View.GONE);
-                                        if (value != null && value.length > 0) {
+                                        if (filterRawAdvDataEnable) {
                                             byte[] rawDataBytes = Arrays.copyOfRange(value, 3, 3 + length);
                                             for (int i = 0, l = rawDataBytes.length; i < l; ) {
                                                 View v = LayoutInflater.from(FilterOptionsActivity.this).inflate(R.layout.item_raw_data_filter, llRawDataFilter, false);

@@ -30,16 +30,16 @@ public class ScanWindowDialog extends BaseDialog<Integer> implements SeekBar.OnS
     protected void renderConvertView(View convertView, Integer progress) {
         switch (progress) {
             case 0:
-                tvScanWindowValue.setText("0ms/1000ms");
+                tvScanWindowValue.setText("0");
                 break;
             case 2:
-                tvScanWindowValue.setText("500ms/1000ms");
+                tvScanWindowValue.setText("1/2");
                 break;
             case 3:
-                tvScanWindowValue.setText("250ms/1000ms");
+                tvScanWindowValue.setText("1/4");
                 break;
             case 4:
-                tvScanWindowValue.setText("125ms/1000ms");
+                tvScanWindowValue.setText("1/8");
                 break;
         }
         if (progress > 0) {
@@ -76,16 +76,16 @@ public class ScanWindowDialog extends BaseDialog<Integer> implements SeekBar.OnS
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         switch (progress) {
             case 3:
-                tvScanWindowValue.setText("0ms/1000ms");
+                tvScanWindowValue.setText("0");
                 break;
             case 0:
-                tvScanWindowValue.setText("500ms/1000ms");
+                tvScanWindowValue.setText("1/2");
                 break;
             case 1:
-                tvScanWindowValue.setText("250ms/1000ms");
+                tvScanWindowValue.setText("1/4");
                 break;
             case 2:
-                tvScanWindowValue.setText("125ms/1000ms");
+                tvScanWindowValue.setText("1/8");
                 break;
         }
     }

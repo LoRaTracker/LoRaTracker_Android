@@ -156,16 +156,16 @@ public class SettingFragment extends Fragment {
             String scanModeStr = "";
             switch (scanMode) {
                 case 4:
-                    scanModeStr = "0ms/1000ms";
+                    scanModeStr = "0";
                     break;
                 case 0:
-                    scanModeStr = "500ms/1000ms";
+                    scanModeStr = "1/2";
                     break;
                 case 1:
-                    scanModeStr = "250ms/1000ms";
+                    scanModeStr = "1/4";
                     break;
                 case 2:
-                    scanModeStr = "125ms/1000ms";
+                    scanModeStr = "1/8";
                     break;
             }
             tvScanWindow.setText(String.format("Scan Window(%s)", scanModeStr));
@@ -215,13 +215,13 @@ public class SettingFragment extends Fragment {
         String scanModeStr = "";
         switch (startTime) {
             case 2:
-                scanModeStr = "500ms/1000ms";
+                scanModeStr = "1/2";
                 break;
             case 3:
-                scanModeStr = "250ms/1000ms";
+                scanModeStr = "1/4";
                 break;
             case 4:
-                scanModeStr = "125ms/1000ms";
+                scanModeStr = "1/8";
                 break;
         }
         tvScanWindow.setText(scannerState ? String.format("Scan Window(%s)", scanModeStr)
