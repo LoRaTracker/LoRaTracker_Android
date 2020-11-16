@@ -76,17 +76,18 @@ Device types can be distinguished by `parseDeviceInfo(DeviceInfo deviceInfo)`.Re
         Iterator iterator = map.keySet().iterator();
         if (iterator.hasNext()) {
             ParcelUuid parcelUuid = (ParcelUuid) iterator.next();
-            if (parcelUuid.toString().startsWith("0000ff02")) {
+            if (parcelUuid.toString().startsWith("0000ff03")) {
                 byte[] bytes = map.get(parcelUuid);
                 if (bytes != null) {
-                    major = String.valueOf(MokoUtils.toInt(Arrays.copyOfRange(bytes, 0, 2)));
-                    minor = String.valueOf(MokoUtils.toInt(Arrays.copyOfRange(bytes, 2, 4)));
-                    rssi_1m = bytes[4];
-                    txPower = bytes[5];
-                    String binary = MokoUtils.hexString2binaryString(MokoUtils.byte2HexString(bytes[6]));
-                    connectable = Integer.parseInt(binary.substring(7));
-                    track = Integer.parseInt(binary.substring(6, 7));
-                    battery = MokoUtils.toInt(Arrays.copyOfRange(bytes, 7, 9));
+                    deviceType = bytes[0] & 0xFF;
+                    major = String.valueOf(MokoUtils.toInt(Arrays.copyOfRange(bytes, 1, 3)));
+                    minor = String.valueOf(MokoUtils.toInt(Arrays.copyOfRange(bytes, 3, 5)));
+                    rssi_1m = bytes[5];
+                    txPower = bytes[6];
+                    String binary = MokoUtils.hexString2binaryString(MokoUtils.byte2HexString(bytes[7]));
+                    connectable = Integer.parseInt(binary.substring(4, 5));
+                    track = Integer.parseInt(binary.substring(5, 6));
+                    battery = bytes[8] & 0xFF;
                 }
             } else {
                 return null;
@@ -99,7 +100,7 @@ Device types can be distinguished by `parseDeviceInfo(DeviceInfo deviceInfo)`.Re
 
 
 ```
-MokoSupport.getInstance().connDevice(context, address, mokoConnStateCallback);
+MokoSupport.getInstance().connDevice(context, address);
 ```
 
 When connecting to the device, context, MAC address and callback by EventBus.
@@ -118,12 +119,12 @@ When connecting to the device, context, MAC address and callback by EventBus.
     }
 ```
 
-It uses `EventBus` to notify activity after receiving the status, and send and receive data after connecting to the device with `broadcast`
+It uses `EventBus` to notify activity after receiving the status.
 
 ### 2.3 Send and receive data.
 
 All the request data is encapsulated into **TASK**, and sent to the device in a **QUEUE** way.
-SDK gets task status from task callback (`MokoOrderTaskCallback`) after sending tasks successfully.
+SDK gets task status from task callback (`OrderTaskResponse`) after sending tasks successfully.
 
 * **Task**
 
@@ -131,9 +132,7 @@ At present, all the tasks sent from the SDK can be divided into 4 types:
 
 > 1.  READ：Readable
 > 2.  WRITE：Writable
-> 3.  NOTIFY：Can be listened( Need to enable the notification property of the relevant characteristic values)
-> 4.  WRITE_NO_RESPONSE：After enabling the notification property, send data to the device and listen to the data returned by device.
-> 5.  RESPONSE_TYPE_DISABLE_NOTIFY close the notification property.
+> 3.  WRITE_NO_RESPONSE：After enabling the notification property, send data to the device and listen to the data returned by device.
 
 Encapsulated tasks are as follows:
 
@@ -182,32 +181,25 @@ Adv iBeacon information
 
 * **Create tasks**
 
-The task callback (`MokoOrderTaskCallback`) and task type need to be passed when creating a task. Some tasks also need corresponding parameters to be passed.
-
 Examples of creating tasks are as follows:
 
 ```
 	 // read
-    public OrderTask getManufacturer() {
-        GetManufacturerTask getManufacturerTask = new GetManufacturerTask(this);
+    public static OrderTask getManufacturer() {
+        GetManufacturerTask getManufacturerTask = new GetManufacturerTask();
         return getManufacturerTask;
     }
     // write
-    public OrderTask setConnectionMode(int connectionMode) {
-        SetConnectionModeTask setConnectionModeTask = new SetConnectionModeTask(this);
-        setConnectionModeTask.setData(connectionMode);
-        return setConnectionModeTask;
-    } 
-    public OrderTask deleteTrackedData() {
-        WriteConfigTask task = new WriteConfigTask(this);
-        task.setData(ConfigKeyEnum.DELETE_STORE_DATA);
+    public static OrderTask setPassword(String password) {
+        SetPasswordTask setPasswordTask = new SetPasswordTask();
+        setPasswordTask.setData(password);
+        return setPasswordTask;
+    }
+    public static OrderTask setLoraConnect() {
+        WriteConfigTask task = new WriteConfigTask();
+        task.setLoraConnect();
         return task;
     }
-    // notify
-    public OrderTask openTrackedNotify() {
-        OpenNotifyTask task = new OpenNotifyTask(OrderType.STORE_DATA_NOTIFY, this);
-        return task;
-    }   
     
 ```
 
@@ -221,53 +213,55 @@ The task can be one or more.
 
 * **Task callback**
 
+
 ```java
-/**
- * @ClassPath com.moko.support.callback.OrderCallback
- */
-public interface MokoOrderTaskCallback {
-
-    void onOrderResult(OrderTaskResponse response);
-
-    void onOrderTimeout(OrderTaskResponse response);
-
-    void onOrderFinish();
-}
+	@Subscribe(threadMode = ThreadMode.MAIN)
+    public void onOrderTaskResponseEvent(OrderTaskResponseEvent event) {
+        final String action = event.getAction();
+        if (MokoConstants.ACTION_ORDER_TIMEOUT.equals(action)) {
+        }
+        if (MokoConstants.ACTION_ORDER_FINISH.equals(action)) {
+        }
+        if (MokoConstants.ACTION_ORDER_RESULT.equals(action)) {
+        }
+    }
+   
 ```
-`void onOrderResult(OrderTaskResponse response);`
+
+`ACTION_ORDER_RESULT`
 
 	After the task is sent to the device, the data returned by the device can be obtained by using the `onOrderResult` function, and you can determine witch class the task is according to the `response.orderType` function. The `response.responseValue` is the returned data.
 
-`void onOrderTimeout(OrderTaskResponse response);`
+`ACTION_ORDER_TIMEOUT`
 
 	Every task has a default timeout of 3 seconds to prevent the device from failing to return data due to a fault and the fail will cause other tasks in the queue can not execute normally. After the timeout, the `onOrderTimeout` will be called back. You can determine witch class the task is according to the `response.orderType` function and then the next task continues.
 
-`void onOrderFinish();`
+`ACTION_ORDER_FINISH`
 
 	When the task in the queue is empty, `onOrderFinish` will be called back.
 
 * **Listening task**
 
-If the task belongs to `NOTIFY` and ` WRITE_NO_RESPONSE` task has been sent, the task is in listening state. When there is data returned from the device, the data will be sent in the form of broadcast, and the action of receiving broadcast is `MokoConstants.ACTION_CURRENT_DATA`.
+When there is data returned from the device, the data will be sent in the form of broadcast, and the action of receiving broadcast is `MokoConstants.ACTION_CURRENT_DATA`.
 
 ```
 String action = intent.getAction();
 ...
 if (MokoConstants.ACTION_CURRENT_DATA.equals(action)) {
-                    OrderType orderType = (OrderType) intent.getSerializableExtra(MokoConstants.EXTRA_KEY_CURRENT_DATA_TYPE);
-                    byte[] value = intent.getByteArrayExtra(MokoConstants.EXTRA_KEY_RESPONSE_VALUE);
-                    ...
-                }
+    OrderTaskResponse response = event.getResponse();
+    OrderType orderType = response.orderType;
+    int responseType = response.responseType;
+    byte[] value = response.responseValue;
+    ...
+}
 ```
 
-Get `OrderTaskResponse` from the **intent** of `onReceive`, and the corresponding **key** value is `MokoConstants.EXTRA_KEY_RESPONSE_ORDER_TASK`.
+Get `OrderTaskResponse` from the `OrderTaskResponseEvent`, and the corresponding **key** value is `response.responseValue`.
 
 ## 3. Special instructions
 
 > 1. AndroidManifest.xml of SDK has declared to access SD card and get Bluetooth permissions.
-> 2. The SDK comes with logging, and if you want to view the log in the SD card, please to use "LogModule". The log path is : root directory of SD card/LoRaTracker/LoRaTracker. It only records the log of the day and the day before.
-> 3. Just connecting to the device successfully, it needs to delay 1 second before sending data, otherwise the device can not return data normally.
-> 4. We suggest that sending and receiving data should be executed in the "Service". There will be a certain delay when the device returns data, and you can broadcast data to the "Activity" after receiving in the "Service". Please refer to the "Demo Project".
+> 2. The SDK comes with logging, and if you want to view the log in the SD card, please to use "LogModule". The log path is : root directory of SD card/LoRaTracker/LoRaTracker.txt. It only records the log of the day and the day before.
 
 
 
